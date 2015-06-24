@@ -38,6 +38,13 @@ app.get('/:user', function(req, res){
     });
 });
 
+app.get('/d/:hash', function(req, res){
+    var hash = new Storage(req.params.hash);
+    user.getStorage().list(function(files) {
+        res.render('account', {user: user, files: files, path:req.originalUrl});
+    });
+});
+
 app.get('/', function(req, res){
     var user = req.params.user;
     res.download('path/to/file.pdf');
