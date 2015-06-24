@@ -12,11 +12,10 @@
         <hr>
         <% files.forEach(function(file){ %>
             <div>
-                <% if(file.stats.isDirectory()) { %>
-                <a href="<%= storage.getName() %>/download/<%= file.name %>">
-                <% } else { %>
-                <a href="<%= storage.getName() %>/download/<%= file.name %>">
-                <% } %>
+                <a href="<%= file.urlDl %>">
+                    <span class="pull-right"><i class="fa fa-cloud-download"></i></span>
+                </a>
+                <a href="<%= file.url %>">
                 <h4 style="margin-bottom: 0px;"><i class="fa fa-<%= file.mime %>"></i> <%= file.name %></h4>
                 </a>
                 <%= file.stats.ctime.getDate() %>/<%= file.stats.ctime.getMonth()+1 %>/<%= file.stats.ctime.getFullYear() %> à <%= file.stats.ctime.getSeconds() %>:<%= file.stats.ctime.getMinutes() %>:<%= file.stats.ctime.getHours() %>

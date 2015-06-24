@@ -95,8 +95,17 @@ storage.prototype = {
             }
         });
     },
-    list: function(cb) {
+    list: function(blob, cb) {
+        var url = '/nodes/' + this.name + '/blob/';
+        var urlDownload = '/nodes/' + this.name + '/download/';
         var path = this.path;
+        if(cb == undefined) {
+            cb = blob;
+            blob = '';
+        } else {
+            path += '/' + blob;
+        }
+        
         fs.readdir(path, function(err, files) {
             if (err) {
                 console.error(err);
@@ -111,10 +120,14 @@ storage.prototype = {
                     if(stats.isDirectory()) {
                         mimeclass = 'folder';
                     }
+                    var filePath = url + blob + '/' + file;
+                    var fileDownloadPath = urlDownload + blob + '/' + file;
                     return {
                         name: file,
                         stats: stats,
-                        mime: mimeclass
+                        mime: mimeclass,
+                        url: filePath.replace('//', '/'),
+                        urlDl: fileDownloadPath.replace('//', '/')
                     };
                 });
                 if(cb) cb(stats);
@@ -129,21 +142,9 @@ storage.prototype = {
         } else if(stat.isDirectory()) {
             var zip = new easyzip.EasyZip();
             zip.zipFolder(storage, function(){
-                var folder = 'tmp/' + this.name + '/';
-                fs.exists(folder, function(exists) {
-                    var tmp = folder + blob + '.zip';
-                    if(!exists) {
-                        mkdirp(folder, function(err) {
-                            if (err) console.error(err);
-                            zip.writeToFile(tmp, function() {
-                                cb(tmp, true);
-                            });
-                        });
-                    } else {
-                        zip.writeToFile(tmp, function() {
-                            cb(tmp, true);
-                        });
-                    }
+                var tmp = 'tmp/'+ pathManager.basename(blob) + '.zip';
+                zip.writeToFile(tmp, function() {
+                    cb(tmp, true);
                 });
             });
         }
