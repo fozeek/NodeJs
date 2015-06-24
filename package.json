@@ -1,6 +1,7 @@
 {
-  "name": "socialab",
+  "name": "NodeJs",
   "devDependencies": {
     "bower": "*",
+    "express": "*"
   }
 }
