@@ -1,10 +1,11 @@
 var http = require('http');
 var express = require('express');
 var Client = require('../library/client');
+var Storage = require('../library/storage');
 
 var app = express();
 
-var client1 = new Client('fozeek');
+var client1 = new Client('myfirstproject');
 
 var client2 = new Client('muusha');
 // client2.getStorage().mkdir('lolilol');
@@ -31,12 +32,26 @@ app.get('/', function(req, res){
     res.render('index.ejs');
 });
 
-app.get('/:user', function(req, res){
+app.get('/nodes', function(req, res){
     var user = new Client(req.params.user);
     user.getStorage().list(function(files) {
         res.render('account', {user: user, files: files, path:req.originalUrl});
     });
 });
+app.get('/nodes/:hash', function(req, res){
+    var storage = new Storage('storage/' + req.params.hash, req.params.hash);
+    storage.list(function(files) {
+        res.render('list', {storage: storage, files: files, path:req.originalUrl});
+    });
+});
+app.get('/nodes/:hash/:file', function(req, res){
+    res.render('file', {storage: storage, files: files, path:req.originalUrl});
+});
+app.get('/nodes/:hash/:file/download', function(req, res){
+    res.download('storage/' + req.params.hash + '/' + req.params.file);
+});
+
+
 
 app.get('/d/:hash', function(req, res){
     var hash = new Storage(req.params.hash);

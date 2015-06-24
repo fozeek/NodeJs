@@ -2,10 +2,11 @@
   "name": "NodeJs",
   "dependencies": {
     "bower": "*",
-    "jade": "^1.11.0",
+    "ejs": "*",
     "express": "*",
     "graceful-fs": "*",
-    "mkdirp": "*",
-    "ejs": "*"
+    "jade": "^1.11.0",
+    "mime": "^1.3.4",
+    "mkdirp": "*"
   }
 }
