@@ -16,11 +16,18 @@ client2.getStorage().write('lolilol/2/monfichier.txt', 'COUCOUCOUCOUC');
 // client2.getStorage().remove('lolilol/2/monfichier3.txt');
 client1.getStorage().write('mon/path/monfichier.txt', 'ANNNH');
 
-app.set('views', '../templates');
-app.set('view engine', 'jade');
+app.set('views', 'templates');
+app.set('view engine', 'ejs');
+
+//var parser = require('bodyParser');
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded());
+
+//Acces aux objets statiques
+//app.use(express.static(path.join(__dirname, 'views')));
 
 app.get('/', function(req, res){
-    res.render('index');
+    res.render('index.ejs');
 });
 
 var server = app.listen(3000);
