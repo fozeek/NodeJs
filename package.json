@@ -1,0 +1,6 @@
+{
+  "name": "socialab",
+  "devDependencies": {
+    "bower": "*",
+  }
+}
