@@ -56,12 +56,22 @@ app.get('/nodes/:hash', function(req, res){
         res.render('list', {storage: storage, files: files, path:req.originalUrl});
     });
 });
-app.get('/nodes/:hash/blob/(*)', function(req, res){
-    var blob = req.params[0].replace("nodes/" + req.params.hash + "/blob/", '');
+app.get('/nodes/:hash/blob/*', function(req, res){
+    var blob = req.params[0].replace('nodes/' + req.params.hash + '/blob/', '');
+    var path = 'storage/' + req.params.hash + '/' + blob;
+    var stats = fs.lstatSync(path);
     var storage = new Storage(req.params.hash);
-    storage.list(blob, function(files) {
-        res.render('list', {storage: storage, files: files, path:req.originalUrl});
-    });
+    if(stats.isFile()) {
+        fs.readFile(path, "utf8", function(err, data) {
+            if (err) console.error(err);
+            else res.render('file', {storage: storage, data: data});
+        })
+    } else {
+        console.log('lol');
+        storage.list(blob, function(files) {
+            res.render('list', {storage: storage, files: files});
+        });
+    }
 });
 app.get('/nodes/:hash/download/*', function(req, res){
     var blob = req.params[0].replace("nodes/" + req.params.hash + "/download/", '');
