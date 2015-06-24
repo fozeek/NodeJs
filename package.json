@@ -5,6 +5,7 @@
     "jade": "^1.11.0",
     "express": "*",
     "graceful-fs": "*",
-    "mkdirp": "*"
+    "mkdirp": "*",
+    "ejs": "*"
   }
 }

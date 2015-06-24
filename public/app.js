@@ -32,8 +32,10 @@ app.get('/', function(req, res){
 });
 
 app.get('/:user', function(req, res){
-    var user = req.params.user;
-    res.render('account', {user: user});
+    var user = new Client(req.params.user);
+    user.getStorage().list(function(files) {
+        res.render('account', {user: user, files: files, path:req.originalUrl});
+    });
 });
 
 app.get('/', function(req, res){
