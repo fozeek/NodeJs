@@ -1,10 +1,10 @@
 {
   "name": "NodeJs",
-  "devDependencies": {
-    "bower": "*",
-    "express": "*"
-  },
   "dependencies": {
-    "jade": "^1.11.0"
+    "bower": "*",
+    "jade": "^1.11.0",
+    "express": "*",
+    "graceful-fs": "*",
+    "mkdirp": "*"
   }
 }
