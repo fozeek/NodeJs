@@ -3,8 +3,6 @@ var express = require('express');
 var Client = require('../library/client');
 var Storage = require('../library/storage');
 var fs = require('graceful-fs');
-var easyzip = require('easy-zip');
-var mkdirp = require('mkdirp');
 
 
 //Access DB
@@ -53,7 +51,7 @@ app.get('/nodes', function(req, res){
     });
 });
 app.get('/nodes/:hash', function(req, res){
-    var storage = new Storage('storage/' + req.params.hash, req.params.hash);
+    var storage = new Storage(req.params.hash);
     storage.list(function(files) {
         res.render('list', {storage: storage, files: files, path:req.originalUrl});
     });
@@ -63,36 +61,12 @@ app.get('/nodes/:hash/blob/*', function(req, res){
     res.render('file', {file: blob});
 });
 app.get('/nodes/:hash/download/*', function(req, res){
-    var blob = req.params[0];
-    var storage = 'storage/' + req.params.hash + '/' + blob;
-    var stat = fs.lstatSync(storage);
-    if(stat.isFile()) {
-        res.download(storage);
-    } else if(stat.isDirectory()) {
-        var zip = new easyzip.EasyZip();
-        zip.zipFolder(storage, function(){
-            var folder = 'tmp/' + req.params.hash + '/';
-            fs.exists(folder, function(exists) {
-                var tmp = folder + blob + '.zip';
-                if(!exists) {
-                    mkdirp(folder, function(err) {
-                        if (err) console.error(err);
-                        zip.writeToFile(tmp, function() {
-                            res.download(tmp, function() {
-                                fs.unlink(tmp);
-                            });
-                        });
-                    });
-                } else {
-                    zip.writeToFile(tmp, function() {
-                        res.download(tmp, function() {
-                            fs.unlink(tmp);
-                        });
-                    });
-                }
-            });
+    var storage = new Storage(req.params.hash);
+    storage.download(req.params[0], function(file, tmp){
+        res.download(file, function() {
+            if(tmp) fs.unlink(file);
         });
-    }
+    });
 });
 
 var server = app.listen(3000);

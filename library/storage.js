@@ -2,9 +2,10 @@ var fs = require('graceful-fs');
 var mkdirp = require('mkdirp');
 var pathManager = require('path');
 var mime = require('mime');
+var easyzip = require('easy-zip');
 
-function storage(path, name) {
-    this.path = path;
+function storage(name) {
+    this.path = 'storage/' + name;
     this.name = name;
 }
 
@@ -119,6 +120,33 @@ storage.prototype = {
                 if(cb) cb(stats);
             }
         });
+    },
+    download: function(blob, cb) {
+        var storage = 'storage/' + this.name + '/' + blob;
+        var stat = fs.lstatSync(storage);
+        if(stat.isFile()) {
+            cb(storage, false);
+        } else if(stat.isDirectory()) {
+            var zip = new easyzip.EasyZip();
+            zip.zipFolder(storage, function(){
+                var folder = 'tmp/' + this.name + '/';
+                fs.exists(folder, function(exists) {
+                    var tmp = folder + blob + '.zip';
+                    if(!exists) {
+                        mkdirp(folder, function(err) {
+                            if (err) console.error(err);
+                            zip.writeToFile(tmp, function() {
+                                cb(tmp, true);
+                            });
+                        });
+                    } else {
+                        zip.writeToFile(tmp, function() {
+                            cb(tmp, true);
+                        });
+                    }
+                });
+            });
+        }
     }
 };
 
