@@ -1,6 +1,9 @@
 var http = require('http');
 var express = require('express');
 var Client = require('../library/client');
+var Storage = require('../library/storage');
+var fs = require('graceful-fs');
+
 
 //Access DB
 var mongo = require('mongodb');
@@ -41,23 +44,29 @@ app.post('/account', function(req, res){
     });
 });
 
-app.get('/:user', function(req, res){
+app.get('/nodes', function(req, res){
     var user = new Client(req.params.user);
     user.getStorage().list(function(files) {
         res.render('account', {user: user, files: files, path:req.originalUrl});
     });
 });
-
-app.get('/d/:hash', function(req, res){
-    var hash = new Storage(req.params.hash);
-    user.getStorage().list(function(files) {
-        res.render('account', {user: user, files: files, path:req.originalUrl});
+app.get('/nodes/:hash', function(req, res){
+    var storage = new Storage(req.params.hash);
+    storage.list(function(files) {
+        res.render('list', {storage: storage, files: files, path:req.originalUrl});
     });
 });
-
-app.get('/download', function(req, res){
-    var user = req.params.user;
-    res.download('path/to/file.pdf');
+app.get('/nodes/:hash/blob/*', function(req, res){
+    blob = req.params[0];
+    res.render('file', {file: blob});
+});
+app.get('/nodes/:hash/download/*', function(req, res){
+    var storage = new Storage(req.params.hash);
+    storage.download(req.params[0], function(file, tmp){
+        res.download(file, function() {
+            if(tmp) fs.unlink(file);
+        });
+    });
 });
 
 var server = app.listen(3000);
