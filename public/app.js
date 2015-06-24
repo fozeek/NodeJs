@@ -63,27 +63,31 @@ app.get('/nodes/:hash/blob/*', function(req, res){
     res.render('file', {file: blob});
 });
 app.get('/nodes/:hash/download/*', function(req, res){
-    blob = req.params[0];
-    var stat = fs.lstatSync('storage/' + req.params.hash + '/' + blob);
+    var blob = req.params[0];
+    var storage = 'storage/' + req.params.hash + '/' + blob;
+    var stat = fs.lstatSync(storage);
     if(stat.isFile()) {
-        res.download('storage/' + req.params.hash + '/' + blob);
+        res.download(storage);
     } else if(stat.isDirectory()) {
         var zip = new easyzip.EasyZip();
-        var path = 'storage/' + req.params.hash + '/' + blob;
-        zip.zipFolder(path, function(){
+        zip.zipFolder(storage, function(){
             var folder = 'tmp/' + req.params.hash + '/';
             fs.exists(folder, function(exists) {
-                console.log(exists);
+                var tmp = folder + blob + '.zip';
                 if(!exists) {
                     mkdirp(folder, function(err) {
                         if (err) console.error(err);
-                        zip.writeToFile('tmp/' + req.params.hash + '/' + blob + '.zip', function() {
-                            res.download('tmp/' + req.params.hash + '/' + blob + '.zip');
+                        zip.writeToFile(tmp, function() {
+                            res.download(tmp, function() {
+                                fs.unlink(tmp);
+                            });
                         });
                     });
                 } else {
-                    zip.writeToFile('tmp/' + req.params.hash + '/' + blob + '.zip', function() {
-                        res.download('tmp/' + req.params.hash + '/' + blob + '.zip');
+                    zip.writeToFile(tmp, function() {
+                        res.download(tmp, function() {
+                            fs.unlink(tmp);
+                        });
                     });
                 }
             });
