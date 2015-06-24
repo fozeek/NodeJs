@@ -2,6 +2,9 @@ var http = require('http');
 var express = require('express');
 var Client = require('../library/client');
 var Storage = require('../library/storage');
+var fs = require('graceful-fs');
+var easyzip = require('easy-zip');
+var mkdirp = require('mkdirp');
 
 
 //Access DB
@@ -55,11 +58,37 @@ app.get('/nodes/:hash', function(req, res){
         res.render('list', {storage: storage, files: files, path:req.originalUrl});
     });
 });
-app.get('/nodes/:hash/:file', function(req, res){
-    res.render('file', {storage: storage, files: files, path:req.originalUrl});
+app.get('/nodes/:hash/blob/*', function(req, res){
+    blob = req.params[0];
+    res.render('file', {file: blob});
 });
-app.get('/nodes/:hash/:file/download', function(req, res){
-    res.download('storage/' + req.params.hash + '/' + req.params.file);
+app.get('/nodes/:hash/download/*', function(req, res){
+    blob = req.params[0];
+    var stat = fs.lstatSync('storage/' + req.params.hash + '/' + blob);
+    if(stat.isFile()) {
+        res.download('storage/' + req.params.hash + '/' + blob);
+    } else if(stat.isDirectory()) {
+        var zip = new easyzip.EasyZip();
+        var path = 'storage/' + req.params.hash + '/' + blob;
+        zip.zipFolder(path, function(){
+            var folder = 'tmp/' + req.params.hash + '/';
+            fs.exists(folder, function(exists) {
+                console.log(exists);
+                if(!exists) {
+                    mkdirp(folder, function(err) {
+                        if (err) console.error(err);
+                        zip.writeToFile('tmp/' + req.params.hash + '/' + blob + '.zip', function() {
+                            res.download('tmp/' + req.params.hash + '/' + blob + '.zip');
+                        });
+                    });
+                } else {
+                    zip.writeToFile('tmp/' + req.params.hash + '/' + blob + '.zip', function() {
+                        res.download('tmp/' + req.params.hash + '/' + blob + '.zip');
+                    });
+                }
+            });
+        });
+    }
 });
 
 var server = app.listen(3000);

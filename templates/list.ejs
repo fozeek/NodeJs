@@ -9,16 +9,17 @@
     <div class="container" style="width: 700px; margin-top: 50px">
 
         <h1><small>Storage of </small><%= storage.getName() %></h1>
+        <hr>
         <% files.forEach(function(file){ %>
             <div>
                 <% if(file.stats.isDirectory()) { %>
-                <a href="<%= path %>/<%= file.name %>">
+                <a href="<%= storage.getName() %>/download/<%= file.name %>">
                 <% } else { %>
-                <a href="<%= path %>/<%= file.name %>/download">
+                <a href="<%= storage.getName() %>/download/<%= file.name %>">
                 <% } %>
                 <h4 style="margin-bottom: 0px;"><i class="fa fa-<%= file.mime %>"></i> <%= file.name %></h4>
                 </a>
-                <%= file.stats.ctime %>
+                <%= file.stats.ctime.getDate() %>/<%= file.stats.ctime.getMonth()+1 %>/<%= file.stats.ctime.getFullYear() %> à <%= file.stats.ctime.getSeconds() %>:<%= file.stats.ctime.getMinutes() %>:<%= file.stats.ctime.getHours() %>
             </div>
         <% }); %>
     </div>
