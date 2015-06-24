@@ -32,7 +32,6 @@ storage.prototype = {
     mkdir: function(path, cb) {
         var path = this.path + '/' +  path;
         fs.exists(path, function(exists) {
-            console.log(exists);
             if(!exists) {
                 mkdirp(path, function(err) {
                     if (err) console.error(err);
@@ -53,6 +52,21 @@ storage.prototype = {
             }
         });
     },
+    list: function(cb) {
+        var path = this.path;
+        fs.readdir(path, function(err, files) {
+            if (err) {
+                console.error(err);
+                if(cb) cb([]);
+            }
+            else {
+                stats = files.map(function(file){
+                    return {name: file, stats: fs.lstatSync(path + '/' + file)};
+                });
+                if(cb) cb(stats);
+            }
+        });
+    }
 };
 
 

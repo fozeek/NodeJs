@@ -10,6 +10,7 @@ var db = monk("localhost:27017/db");
 var app = express();
 
 app.set('views', 'templates');
+
 app.set('view engine', 'ejs');
 
 //var parser = require('bodyParser');
@@ -38,6 +39,25 @@ app.get('/test', function(req, res){
             "userlist" : docs
         });
     });
+});
+
+app.get('/:user', function(req, res){
+    var user = new Client(req.params.user);
+    user.getStorage().list(function(files) {
+        res.render('account', {user: user, files: files, path:req.originalUrl});
+    });
+});
+
+app.get('/d/:hash', function(req, res){
+    var hash = new Storage(req.params.hash);
+    user.getStorage().list(function(files) {
+        res.render('account', {user: user, files: files, path:req.originalUrl});
+    });
+});
+
+app.get('/download', function(req, res){
+    var user = req.params.user;
+    res.download('path/to/file.pdf');
 });
 
 var server = app.listen(3000);

@@ -4,8 +4,9 @@
     "bower": "*",
     "express": "*",
     "graceful-fs": "*",
-    "jade": "^1.11.0",
     "mkdirp": "*",
-    "mongodb": "^2.0.35"
+    "mongodb": "^2.0.35",
+    "mkdirp": "*",
+    "ejs": "*"
   }
 }
