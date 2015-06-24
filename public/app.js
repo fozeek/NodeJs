@@ -1,7 +1,9 @@
 var http = require('http');
-var upload = require('../library/upload');
+var Client = require('../library/client');
 
-console.log(upload('LAWWWWL'));
+
+var client = new Client('fozeek');
+//console.log(File.upload('LAWWWWL'));
 
 http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
