@@ -31,7 +31,7 @@ app.get('/', function(req, res){
     res.render('index.ejs');
 });
 
-app.get('/test', function(req, res){
+app.post('/account', function(req, res){
     var db = req.db;
     var collection = db.get('User');
     collection.find({},{},function(e,docs){
