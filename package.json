@@ -3,5 +3,8 @@
   "devDependencies": {
     "bower": "*",
     "express": "*"
+  },
+  "dependencies": {
+    "jade": "^1.11.0"
   }
 }
