@@ -2,6 +2,8 @@
   "name": "NodeJs",
   "devDependencies": {
     "bower": "*",
-    "express": "*"
+    "express": "*",
+    "graceful-fs": "*",
+    "mkdirp": "*"
   }
 }
