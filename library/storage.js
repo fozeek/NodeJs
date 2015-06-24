@@ -32,7 +32,6 @@ storage.prototype = {
     mkdir: function(path, cb) {
         var path = this.path + '/' +  path;
         fs.exists(path, function(exists) {
-            console.log(exists);
             if(!exists) {
                 mkdirp(path, function(err) {
                     if (err) console.error(err);

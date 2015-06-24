@@ -16,11 +16,21 @@ client2.getStorage().write('lolilol/2/monfichier.txt', 'COUCOUCOUCOUC');
 // client2.getStorage().remove('lolilol/2/monfichier3.txt');
 client1.getStorage().write('mon/path/monfichier.txt', 'ANNNH');
 
-app.set('views', '../templates');
+app.set('views', 'templates');
 app.set('view engine', 'jade');
 
 app.get('/', function(req, res){
     res.render('index');
+});
+
+app.get('/:user', function(req, res){
+    var user = req.params.user;
+    res.render('account', {user: user});
+});
+
+app.get('/', function(req, res){
+    var user = req.params.user;
+    res.download('path/to/file.pdf');
 });
 
 var server = app.listen(3000);
