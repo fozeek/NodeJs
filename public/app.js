@@ -62,18 +62,4 @@ app.get('/nodes/:hash/:file/download', function(req, res){
     res.download('storage/' + req.params.hash + '/' + req.params.file);
 });
 
-
-
-app.get('/d/:hash', function(req, res){
-    var hash = new Storage(req.params.hash);
-    user.getStorage().list(function(files) {
-        res.render('account', {user: user, files: files, path:req.originalUrl});
-    });
-});
-
-app.get('/download', function(req, res){
-    var user = req.params.user;
-    res.download('path/to/file.pdf');
-});
-
 var server = app.listen(3000);
