@@ -30,6 +30,7 @@ app.use(function(req,res,next){
     req.db = new Database('db');
     next();
 });
+
 app.use(multer({ dest: './storage/',
     rename: function (fieldname, filename) {
         return filename;
@@ -46,11 +47,7 @@ app.use(multer({ dest: './storage/',
     }
 }));
 
-app.get('/', function(req, res){
-    res.render('index', {message:false});
-});
-
-app.route('/')
+app.route('/login')
     .get(function(req, res){
         res.render('index', {message:false});
     })
@@ -62,7 +59,7 @@ app.route('/')
                     req.session.user = users[0];
                     res.redirect('/nodes');
                 } else {
-                    var message = 'Utilisateur incorrect.';
+                    var message = 'Identifiants incorrects.';
                     res.render('index', {message:message});
                 } 
             });
@@ -106,49 +103,48 @@ app.route('/signin')
         }
     });
 
-app.get('/nodes', function(req, res){
-    console.log(req.session.user);
-    fs.readdir('storage/', function(err, folders) {
-        if (err) {
-            console.error(err);
-            if(cb) cb([]);
-        }
-        else {
-            var directories = folders.map(function(folder){
-                var stats = fs.lstatSync('storage/' + folder);
-                var long = Date.now() - stats.ctime.getTime();
-                var time = {
-                    hours: Math.floor(long/3600000),
-                    minutes: Math.floor((long/60000)%60),
-                    secondes: Math.floor((long/1000)%60)
-                };
-                return {
-                    name: folder,
-                    stats: stats,
-                    url: '/nodes/' + folder + '/blob/',
-                    time: time,
-                    urlDl: '/nodes/' + folder + '/download/',
-                };
-            });
-            res.render('directories', {directories: directories});
-        }
-    });
-});
-app.get('/nodes/:hash', function(req, res){
-    var storage = new Storage(req.params.hash);
-    storage.list(function(files) {
-        res.render('list', {storage: storage, files: files, path:req.originalUrl});
-    });
-});
+// app.get('/nodes', function(req, res){
+//     fs.readdir('storage/', function(err, folders) {
+//         if (err) {
+//             console.error(err);
+//             if(cb) cb([]);
+//         }
+//         else {
+//             var directories = folders.map(function(folder){
+//                 var stats = fs.lstatSync('storage/' + folder);
+//                 var long = Date.now() - stats.ctime.getTime();
+//                 var time = {
+//                     hours: Math.floor(long/3600000),
+//                     minutes: Math.floor((long/60000)%60),
+//                     secondes: Math.floor((long/1000)%60)
+//                 };
+//                 return {
+//                     name: folder,
+//                     stats: stats,
+//                     url: '/nodes/' + folder + '/blob/',
+//                     time: time,
+//                     urlDl: '/nodes/' + folder + '/download/',
+//                 };
+//             });
+//             res.render('directories', {directories: directories});
+//         }
+//     });
+// });
+// app.get('/:hash', function(req, res){
+//     var storage = new Storage(req.params.hash);
+//     storage.list(function(files) {
+//         res.render('list', {storage: storage, files: files, path:req.originalUrl});
+//     });
+// });
 
-app.all('/nodes/:hash/blob/*', function(req, res){
-    var blob = req.params[0].replace('nodes/' + req.params.hash + '/blob/', '');
+app.all('/:hash*', function(req, res){
+    var blob = req.params[0].replace(req.params.hash, '');
     var path = 'storage/' + req.params.hash + '/' + blob;
     var stats = fs.lstatSync(path);
     var storage = new Storage(req.params.hash);
 
     var render = function() {
-        var url = '/nodes/' + req.params.hash + '/blob/';
+        var url = '/' + req.params.hash + '/';
         var breadcrumbs = blob.split('/').map(function(name) {
             url += '/' + name;
             return {
@@ -163,7 +159,7 @@ app.all('/nodes/:hash/blob/*', function(req, res){
             })
         } else {
             storage.list(blob, function(files) {
-                res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs});
+                res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs, user: req.session.user});
             });
         }
     }
