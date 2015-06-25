@@ -1,7 +1,9 @@
 {
   "name": "NodeJs",
   "dependencies": {
+    "body-parser": "^1.13.1",
     "bower": "*",
+    "easy-zip": "0.0.4",
     "ejs": "*",
     "express": "*",
     "graceful-fs": "*",

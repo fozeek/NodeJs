@@ -2,46 +2,32 @@ var http = require('http');
 var express = require('express');
 var Client = require('../library/client');
 var Storage = require('../library/storage');
+var Database = require('../library/database');
 var fs = require('graceful-fs');
 var rmdir = require('rimraf');
 var multer  = require('multer');
-
-
-//Access DB
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk("localhost:27017/db");
-
-var app = express();
-
-app.set('views', 'templates');
-
-app.set('view engine', 'ejs');
-
-//var parser = require('bodyParser');
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded());
+var parser = require('body-parser');
 
 //Acces aux objets statiques
 //app.use(express.static(path.join(__dirname, 'views')));
 
-//var collection = db.get("User");
+
+//var users = db.get('User');
+//users.insert({pseudo:"musha", password:"test"});
+
+var app = express();
+app.use(parser.urlencoded({extended:true})); 
+app.use(parser.json());
+//app.use(express.bodyParser());
+
+app.set('views', 'templates');
+app.set('view engine', 'ejs');
 
 app.use(function(req,res,next){
-    req.db = db;
+    req.db = new Database('db');
     next();
 });
 app.use(multer({ dest: './storage/',
-    // rename: function (fieldname, filename) {
-    //     return filename+Date.now();
-    // },
-    // onFileUploadStart: function (file) {
-    //     console.log(file.originalname + ' is starting ...')
-    // },
-    // onFileUploadComplete: function (file) {
-    //     console.log(file.fieldname + ' uploaded to  ' + file.path)
-    //     done=true;
-    // },
     changeDest: function(dest, req, res) {
         console.log(dest + req.body.path);
         console.log(req);
@@ -54,18 +40,36 @@ app.post('/upload',function(req,res){
 });
 
 app.get('/', function(req, res){
-    res.render('index.ejs');
+    res.render('index');
 });
 
-app.post('/account', function(req, res){
-    var db = req.db;
-    var collection = db.get('User');
-    collection.find({},{},function(e,docs){
-        res.render('test.ejs', {
-            "userlist" : docs
-        });
+app.route('/signin')
+    .get(function(req, res){
+        res.render('inscription');
+    })
+    .post(function(req, res){
+        var db = req.db; 
+
+        if (req.body.pseudo != "" && req.body.password != "" && req.body.check != "") {
+            if (req.body.password == req.body.check) {
+                db.addUser(req.body.pseudo, req.body.password);
+                res.redirect('/');
+            }
+        }
+
+        res.redirect('inscription');
     });
-});
+// app.post('/nodes', function(req, res){
+//     var db = req.db;
+//     var user = db.getUser(req.body.pseudo, req.body.password);
+
+//     if (user!="") {
+//         var user = new Client(req.params.user);
+//         user.getStorage().list(function(files) {
+//             res.render('account', {user: user, files: files, path:req.originalUrl});
+//         });
+//     }
+// });
 
 app.get('/nodes', function(req, res){
     fs.readdir('storage/', function(err, folders) {
@@ -100,6 +104,7 @@ app.get('/nodes/:hash', function(req, res){
         res.render('list', {storage: storage, files: files, path:req.originalUrl});
     });
 });
+
 app.get('/nodes/:hash/blob/*', function(req, res){
     var blob = req.params[0].replace('nodes/' + req.params.hash + '/blob/', '');
     var path = 'storage/' + req.params.hash + '/' + blob;
@@ -124,6 +129,7 @@ app.get('/nodes/:hash/blob/*', function(req, res){
         });
     }
 });
+
 app.get('/nodes/:hash/download/*', function(req, res){
     var blob = req.params[0].replace("nodes/" + req.params.hash + "/download/", '');
     var storage = new Storage(req.params.hash);
@@ -159,5 +165,5 @@ function cron() {
             });
         }
     });
-}
+};
 
