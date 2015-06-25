@@ -2,7 +2,7 @@ var mongo = require('mongodb');
 var monk = require('monk');
 
 function database(name) {
-    this.db = monk("localhost/"+name);
+    this.db = monk("node.dev/"+name);
     //this.db.get('User').drop();
 
     this.db.get('Ressource').find({}, function(e, users){
@@ -35,6 +35,11 @@ database.prototype = {
     },
     deleteRessource: function(path) {
 
+    },
+    getRessources: function(paths, cb){
+        this.db.get('Ressource').find({path: {$in: paths}}, function(e, docs){
+            cb(docs);
+        });
     }
 }
 

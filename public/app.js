@@ -111,6 +111,7 @@ app.route('/signin')
     });
 
 app.all('/', function(req, res){
+    console.log(req.db.getRessources('fkezfez'));
     var render = function() {
         fs.readdir('storage/', function(err, folders) {
             if (err) {
