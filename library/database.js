@@ -2,12 +2,12 @@ var mongo = require('mongodb');
 var monk = require('monk');
 
 function database(name) {
-    this.db = monk("localhost/"+name);
+    this.db = monk("node.dev/"+name);
     //this.db.get('User').drop();
 
-    // this.db.get('User').find({}, function(e, users){
-    //     console.log(users);
-    // });
+    this.db.get('Ressource').find({}, function(e, users){
+        console.log(users);
+    });
 }
 
 database.prototype = {
@@ -23,10 +23,21 @@ database.prototype = {
         this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
     },
     updateRessource: function(path) {
-
+        this.getRessource(path, function(docs){
+            var dl = docs[0].download+1;
+            this.db.get('Ressource').update({path:path}, { $set: {download:dl} });
+        })  
     },
     getRessource: function(path, cb) {
         this.db.get('Ressource').find({path:path}, function(e, docs){
+            cb(docs);
+        });
+    },
+    deleteRessource: function(path) {
+
+    },
+    getRessources: function(paths, cb){
+        this.db.get('Ressource').find({path: {$in: paths}}, function(e, docs){
             cb(docs);
         });
     }
