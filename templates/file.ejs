@@ -7,11 +7,11 @@
 </head>
 <body>
     <div class="container" style="width: 700px; margin-top: 50px">
-
-        <h1><small>Storage of </small><%= storage.getName() %></h1>
+        <a href="<%= urlDl %>" class="btn btn-default pull-right" role="button"><i class="fa fa-cloud-download"></i> Download</a>
+        <h1 style="margin-top: 0px;"><small>Storage of </small><%= storage.getName() %></h1>
         <a href="<%= storage.getUrl() %>"><%= storage.getName() %></a><% breadcrumbs.forEach(function(breadcrumb){ %>/<a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a><% }); %>
         <hr style="margin-top: 0px;">
-        <% if(mime == 'image/png' || mime == 'image/gif' || mime == 'image/jpeg') { %>
+        <% if(mime == 'image/png' || mime == 'image/gif' || mime == 'image/jpeg' || mime == 'image/tiff') { %>
         <img style="max-width: 100%;" src="<%= url %>">
         <% } else { %>
         <pre><%= data.toString() %></pre>

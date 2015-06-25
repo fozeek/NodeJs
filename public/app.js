@@ -190,7 +190,7 @@ app.get('/d/:hash*', function(req, res){
 
 app.all('/:hash*', function(req, res){
     var blob = req.params[0].replace(req.params.hash, '');
-    var path = 'storage/' + req.params.hash + '/' + blob;
+    var path = 'storage/' + req.params.hash + blob;
     var stats = fs.lstatSync(path);
     var storage = new Storage(req.params.hash);
 
@@ -210,7 +210,7 @@ app.all('/:hash*', function(req, res){
             var type = mime.lookup(path);
             fs.readFile(path, "utf8", function(err, data) {
                 if (err) console.error(err);
-                else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs, stats: stats, mime: type, url: '/img/' + path.replace('storage/', '')});
+                else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs, stats: stats, mime: type, url: '/img/' + path.replace('storage/', ''), urlDl: '/d/' + path.replace('storage/', '')});
             })
         } else {
             storage.list(blob, function(files, paths) {
