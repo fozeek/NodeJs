@@ -6,6 +6,7 @@ var easyzip = require('easy-zip');
 
 function storage(name) {
     this.path = 'storage/' + name;
+    this.fullPath = this.path;
     this.name = name;
 }
 
@@ -53,6 +54,12 @@ storage.prototype = {
     getUrl: function() {
         return '/nodes/' + this.name + '/blob/';
     },
+    getPath: function() {
+        return this.path;
+    },
+    getFullPath: function() {
+        return this.fullPath;
+    },
     write: function(file, content) {
         var path = pathManager.dirname(file);
         var file = this.path + '/' + file;
@@ -99,6 +106,7 @@ storage.prototype = {
         });
     },
     list: function(blob, cb) {
+        this.fullPath += '/' + blob;
         var url = '/nodes/' + this.name + '/blob/';
         var urlDownload = '/nodes/' + this.name + '/download/';
         var path = this.path;

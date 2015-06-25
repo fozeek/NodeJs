@@ -4,6 +4,7 @@ var Client = require('../library/client');
 var Storage = require('../library/storage');
 var fs = require('graceful-fs');
 var rmdir = require('rimraf');
+var multer  = require('multer');
 
 
 //Access DB
@@ -29,6 +30,27 @@ app.set('view engine', 'ejs');
 app.use(function(req,res,next){
     req.db = db;
     next();
+});
+app.use(multer({ dest: './storage/',
+    // rename: function (fieldname, filename) {
+    //     return filename+Date.now();
+    // },
+    // onFileUploadStart: function (file) {
+    //     console.log(file.originalname + ' is starting ...')
+    // },
+    // onFileUploadComplete: function (file) {
+    //     console.log(file.fieldname + ' uploaded to  ' + file.path)
+    //     done=true;
+    // },
+    changeDest: function(dest, req, res) {
+        console.log(dest + req.body.path);
+        console.log(req);
+        return dest + req.body.path; 
+    }
+}));
+
+app.post('/upload',function(req,res){
+    res.redirect('/nodes');
 });
 
 app.get('/', function(req, res){
@@ -129,7 +151,6 @@ function cron() {
         else {
             stats = folders.forEach(function(folder){
                 var stats = fs.lstatSync(path + folder);
-                console.log(path + folder, now, stats.ctime.getTime());
                 if(now - stats.ctime.getTime() > ttl) {
                     rmdir(path + folder, function(err) {
                         if (err) console.error(err);

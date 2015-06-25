@@ -11,17 +11,7 @@
         <h1><small>Storage of </small><%= storage.getName() %></h1>
         <a href="<%= storage.getUrl() %>"><%= storage.getName() %></a><% breadcrumbs.forEach(function(breadcrumb){ %>/<a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a><% }); %>
         <hr style="margin-top: 0px;">
-        <% files.forEach(function(file){ %>
-            <div>
-                <a href="<%= file.urlDl %>">
-                    <span class="pull-right"><i class="fa fa-cloud-download fa-2x"></i></span>
-                </a>
-                <a href="<%= file.url %>">
-                <h4 style="margin-bottom: 0px;"><i class="fa fa-<%= file.mime %>"></i> <%= file.name %></h4>
-                </a>
-                <%= file.stats.ctime.getDate() %>/<%= file.stats.ctime.getMonth()+1 %>/<%= file.stats.ctime.getFullYear() %> à <%= file.stats.ctime.getSeconds() %>:<%= file.stats.ctime.getMinutes() %>:<%= file.stats.ctime.getHours() %>
-            </div>
-        <% }); %>
+        <pre><%= data.toString() %></pre>
     </div>
 </body>
 </html>
