@@ -2,7 +2,7 @@ var mongo = require('mongodb');
 var monk = require('monk');
 
 function database(name) {
-    this.db = monk("node.dev/"+name);
+    this.db = monk("localhost/"+name);
     //this.db.get('User').drop();
 
     this.db.get('User').find({}, function(e, users){
