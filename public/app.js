@@ -183,7 +183,7 @@ app.get('/d/:hash*', function(req, res){
     storage.download(blob, function(file, tmp){
         res.download(file, function() {
             if(tmp) fs.unlink(file);
-            req.db.updateRessource(file.replace('storage/', ''));
+            req.db.updateRessource(req.params.hash+blob);
         });
     });
 });
