@@ -52,7 +52,7 @@ storage.prototype = {
         return this.name;
     },
     getUrl: function() {
-        return '/' + this.name + '';
+        return '/' + this.name;
     },
     getPath: function() {
         return this.path;

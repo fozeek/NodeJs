@@ -39,10 +39,9 @@ app.use(multer({ dest: './storage/',
     // onFileUploadStart: function (file) {
     //     console.log(file.originalname + ' is starting ...')
     // },
-    // onFileUploadComplete: function (file) {
-    //     console.log(file.fieldname + ' uploaded to  ' + file.path)
-    //     done=true;
-    // },
+    onFileUploadComplete: function (file) {
+        //req.db.createRessource(file.path + file.name);
+    },
     changeDest: function(dest, req, res) {
         return dest + req._parsedUrl + '/';
     }
@@ -126,12 +125,14 @@ app.all('/', function(req, res){
                         minutes: Math.floor((long/60000)%60),
                         secondes: Math.floor((long/1000)%60)
                     };
+                    var db = req.db.getRessource(folder);
                     return {
                         name: folder,
                         stats: stats,
                         url: '/' + folder + '/',
                         time: time,
                         urlDl: '/d/' + folder + '/',
+                        db: db
                     };
                 });
                 res.render('directories', {directories: directories, user: req.session.user});
@@ -145,6 +146,7 @@ app.all('/', function(req, res){
             if(!exists) {
                 mkdirp('storage/' + req.body.name, function(err) {
                     if (err) console.error(err);
+                    //req.db.createRessource(req.body.name);
                     render();
                 });
             }
@@ -190,6 +192,10 @@ app.all('/:hash*', function(req, res){
             })
         } else {
             storage.list(blob, function(files) {
+                // var array = files.map(function(item) {
+                //     item.db = req.db.getRessource(item.url);
+                //     return  item;
+                // });
                 res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs, user: req.session.user});
             });
         }
@@ -197,6 +203,7 @@ app.all('/:hash*', function(req, res){
 
     // POST new folder
     if(req.body.name != undefined) {
+        //req.db.createRessource(blob + '/' + req.body.name);
         storage.mkdir(blob + '/' + req.body.name, render);
     } else {
         render();
