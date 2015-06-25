@@ -61,13 +61,27 @@ app.get('/nodes/:hash', function(req, res){
 });
 
 app.get('/nodes/:hash/blob/*', function(req, res){
-    blob = req.params[0];
-    res.render('file', {file: blob});
+    var blob = req.params[0].replace('nodes/' + req.params.hash + '/blob/', '');
+    var path = 'storage/' + req.params.hash + '/' + blob;
+    var stats = fs.lstatSync(path);
+    var storage = new Storage(req.params.hash);
+    if(stats.isFile()) {
+        fs.readFile(path, "utf8", function(err, data) {
+            if (err) console.error(err);
+            else res.render('file', {storage: storage, data: data});
+        })
+    } else {
+        console.log('lol');
+        storage.list(blob, function(files) {
+            res.render('list', {storage: storage, files: files});
+        });
+    }
 });
 
 app.get('/nodes/:hash/download/*', function(req, res){
+    var blob = req.params[0].replace("nodes/" + req.params.hash + "/download/", '');
     var storage = new Storage(req.params.hash);
-    storage.download(req.params[0], function(file, tmp){
+    storage.download(blob, function(file, tmp){
         res.download(file, function() {
             if(tmp) fs.unlink(file);
         });
