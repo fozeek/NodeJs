@@ -9,6 +9,7 @@ var multer  = require('multer');
 var parser = require('body-parser');
 var path = require('path');
 var session = require('express-session');
+var mkdirp = require('mkdirp');
 
 //var users = db.get('User');
 //users.insert({pseudo:"musha", password:"test"});
@@ -43,7 +44,7 @@ app.use(multer({ dest: './storage/',
     //     done=true;
     // },
     changeDest: function(dest, req, res) {
-        return dest + req._parsedUrl.pathname.replace('/nodes/', '').replace('blob/', '')+ '/';
+        return dest + req._parsedUrl + '/';
     }
 }));
 
@@ -103,31 +104,58 @@ app.route('/signin')
         }
     });
 
-app.get('/', function(req, res){
-    fs.readdir('storage/', function(err, folders) {
-        if (err) {
-            console.error(err);
-            if(cb) cb([]);
-        }
-        else {
-            var directories = folders.map(function(folder){
-                var stats = fs.lstatSync('storage/' + folder);
-                var long = Date.now() - stats.ctime.getTime();
-                var time = {
-                    hours: Math.floor(long/3600000),
-                    minutes: Math.floor((long/60000)%60),
-                    secondes: Math.floor((long/1000)%60)
-                };
-                return {
-                    name: folder,
-                    stats: stats,
-                    url: '/nodes/' + folder + '/blob/',
-                    time: time,
-                    urlDl: '/nodes/' + folder + '/download/',
-                };
-            });
-            res.render('directories', {directories: directories});
-        }
+app.all('/', function(req, res){
+    var render = function() {
+        fs.readdir('storage/', function(err, folders) {
+            if (err) {
+                console.error(err);
+                if(cb) cb([]);
+            }
+            else {
+                var directories = folders.map(function(folder){
+                    var stats = fs.lstatSync('storage/' + folder);
+                    var long = Date.now() - stats.ctime.getTime();
+                    var time = {
+                        hours: Math.floor(long/3600000),
+                        minutes: Math.floor((long/60000)%60),
+                        secondes: Math.floor((long/1000)%60)
+                    };
+                    return {
+                        name: folder,
+                        stats: stats,
+                        url: '/' + folder + '/',
+                        time: time,
+                        urlDl: '/d/' + folder + '/',
+                    };
+                });
+                res.render('directories', {directories: directories});
+            }
+        });
+    };
+
+    // POST new folder
+    if(req.body.name != undefined) {
+        fs.exists('storage/' + req.body.name, function(exists) {
+            if(!exists) {
+                mkdirp('storage/' + req.body.name, function(err) {
+                    if (err) console.error(err);
+                    render();
+                });
+            }
+        });
+    } else {
+        render();
+    }
+});
+
+app.get('/d/:hash*', function(req, res){
+    var blob = req.params[0].replace('d/' + req.params.hash, '');
+    console.log(req.params[0], blob);
+    var storage = new Storage(req.params.hash);
+    storage.download(blob, function(file, tmp){
+        res.download(file, function() {
+            if(tmp) fs.unlink(file);
+        });
     });
 });
 
@@ -167,16 +195,6 @@ app.all('/:hash*', function(req, res){
     } else {
         render();
     }
-});
-
-app.get('/nodes/:hash/download/*', function(req, res){
-    var blob = req.params[0].replace("nodes/" + req.params.hash + "/download/", '');
-    var storage = new Storage(req.params.hash);
-    storage.download(blob, function(file, tmp){
-        res.download(file, function() {
-            if(tmp) fs.unlink(file);
-        });
-    });
 });
 
 var server = app.listen(3000);

@@ -4,10 +4,19 @@
     <title>Connexion</title>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
     <div class="container" style="width: 700px; margin-top: 50px">
-        <a class="btn btn-default pull-right" href="#" role="button">Add Repo</a>
+        <form id="folder" enctype="multipart/form-data" action="" method="post" style="display: none;">
+            <input type="text" name="name" />
+        </form>
+        <div class="input-group pull-right" style="width: 250px;margin-right: 8px;">
+          <input id="name-folder" type="text" name="folder" class="form-control" placeholder="Repo name">
+          <span id="submit-folder" class="input-group-btn">
+            <button type="submit" class="btn btn-default" type="button">Add Repo</button>
+          </span>
+        </div>
         <h1>Supa Storage</h1>
         <hr>
         <% directories.forEach(function(directory){ %>
@@ -23,5 +32,6 @@
             <hr>
         <% }); %>
     </div>
+    <script src="/app.js"></script>
 </body>
 </html>
