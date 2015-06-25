@@ -17,16 +17,18 @@
             <input type="text" name="name" />
         </form>
         <button id="upload" class="btn btn-default pull-right" href="#" role="button">Add File</button>
-        <% } else { %>
-        t'es niqué
-        <% } %>
-
         <div class="input-group pull-right" style="width: 250px;margin-right: 8px;">
           <input id="name-folder" type="text" name="folder" class="form-control" placeholder="Folder name">
           <span id="submit-folder" class="input-group-btn">
             <button type="submit" class="btn btn-default" type="button">Add Folder</button>
           </span>
         </div>
+        <% } else { %>
+        <a class="btn btn-default pull-right" href="/login" role="button" style="margin-left: 5px;">Connexion</a>
+        <a class="btn btn-default pull-right" href="/signin" role="button">Inscription</a>
+        <% } %>
+
+        
         <h1 style="margin-top: 0px;"><small>Storage of </small><%= storage.getName() %></h1>
         <a href="<%= storage.getUrl() %>"><%= storage.getName() %></a><% breadcrumbs.forEach(function(breadcrumb){ %>/<a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a><% }); %>
         <hr style="margin-top: 0px;">

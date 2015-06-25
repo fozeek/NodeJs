@@ -3,19 +3,10 @@
 <head>
     <title>Connexion</title>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $('#signin').click(function(){
-                console.log('test');
-                $(location).attr('href', '/signin');
-            });
-        });
-    </script>
 </head>
 <body>
     <div class="container" style="width: 500px; margin-top: 50px">
-        <form method="post" action="/">
+        <form method="post" action="/login">
             <% if (message != false) { %>
             <div class="alert alert-danger" role="alert">
                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -32,7 +23,6 @@
                 <input type="password" class="form-control" id="password" name="password" value="test">
             </div>
             <button type="submit" class="btn btn-default">Log In</button>
-            <button type="button" class="btn btn-default" id="signin">Sign In</button>
         </form>
     </div>
 </body>

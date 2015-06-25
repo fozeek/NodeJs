@@ -7,8 +7,15 @@
 </head>
 <body>
     <div class="container" style="width: 700px; margin-top: 50px">
+        <% if (user) { %>
+        <a class="btn btn-default pull-right" href="/logout" role="button" style="margin-left: 8px"><i class="fa fa-sign-out" style="font-size: 18px; color:rgba(231,76,60,1.0)"></i></a>
         <a class="btn btn-default pull-right" href="#" role="button">Add Repo</a>
-        <h1>Supa Storage</h1>
+        <% } else { %>
+        <a class="btn btn-default pull-right" href="/login" role="button" style="margin-left: 5px;">Connexion</a>
+        <a class="btn btn-default pull-right" href="/signin" role="button">Inscription</a>
+        <% } %> 
+
+        <h1 style="margin-top: 0px">Supa Storage</h1>
         <hr>
         <% directories.forEach(function(directory){ %>
             <div>

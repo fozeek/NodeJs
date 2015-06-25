@@ -57,7 +57,7 @@ app.route('/login')
             db.getUser(req.body.pseudo, req.body.password, function(users){
                 if (users.length == 1) {
                     req.session.user = users[0];
-                    res.redirect('/nodes');
+                    res.redirect('/');
                 } else {
                     var message = 'Identifiants incorrects.';
                     res.render('index', {message:message});
@@ -68,6 +68,12 @@ app.route('/login')
             res.render('index', {message:message});
         }
     }); 
+
+app.get('/logout', function(req, res){
+    //console.log(req.session.user);
+    req.session.destroy();
+    res.redirect('/');
+});
 
 app.route('/signin')
     .get(function(req, res){
@@ -126,7 +132,7 @@ app.get('/', function(req, res){
                     urlDl: '/nodes/' + folder + '/download/',
                 };
             });
-            res.render('directories', {directories: directories});
+            res.render('directories', {directories: directories, user: req.session.user});
         }
     });
 });
