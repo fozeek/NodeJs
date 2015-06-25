@@ -7,10 +7,7 @@ var fs = require('graceful-fs');
 var rmdir = require('rimraf');
 var multer  = require('multer');
 var parser = require('body-parser');
-
-//Acces aux objets statiques
-//app.use(express.static(path.join(__dirname, 'views')));
-
+var path = require('path');
 
 //var users = db.get('User');
 //users.insert({pseudo:"musha", password:"test"});
@@ -19,6 +16,8 @@ var app = express();
 app.use(parser.urlencoded({extended:true})); 
 app.use(parser.json());
 //app.use(express.bodyParser());
+//Acces aux objets statiques
+app.use(express.static(path.join(__dirname, '../static')));
 
 app.set('views', 'templates');
 app.set('view engine', 'ejs');
@@ -28,16 +27,20 @@ app.use(function(req,res,next){
     next();
 });
 app.use(multer({ dest: './storage/',
+    rename: function (fieldname, filename) {
+        return filename;
+    },
+    // onFileUploadStart: function (file) {
+    //     console.log(file.originalname + ' is starting ...')
+    // },
+    // onFileUploadComplete: function (file) {
+    //     console.log(file.fieldname + ' uploaded to  ' + file.path)
+    //     done=true;
+    // },
     changeDest: function(dest, req, res) {
-        console.log(dest + req.body.path);
-        console.log(req);
-        return dest + req.body.path; 
+        return dest + req._parsedUrl.pathname.replace('/nodes/', '').replace('blob/', '')+ '/';
     }
 }));
-
-app.post('/upload',function(req,res){
-    res.redirect('/nodes');
-});
 
 app.get('/', function(req, res){
     res.render('index');
@@ -105,28 +108,38 @@ app.get('/nodes/:hash', function(req, res){
     });
 });
 
-app.get('/nodes/:hash/blob/*', function(req, res){
+app.all('/nodes/:hash/blob/*', function(req, res){
     var blob = req.params[0].replace('nodes/' + req.params.hash + '/blob/', '');
     var path = 'storage/' + req.params.hash + '/' + blob;
     var stats = fs.lstatSync(path);
     var storage = new Storage(req.params.hash);
-    var url = '/nodes/' + req.params.hash + '/blob/';
-    var breadcrumbs = blob.split('/').map(function(name) {
-        url += '/' + name;
-        return {
-            name: name,
-            url: url.replace('//', '/')
-        }
-    });
-    if(stats.isFile()) {
-        fs.readFile(path, "utf8", function(err, data) {
-            if (err) console.error(err);
-            else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs});
-        })
-    } else {
-        storage.list(blob, function(files) {
-            res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs});
+
+    var render = function() {
+        var url = '/nodes/' + req.params.hash + '/blob/';
+        var breadcrumbs = blob.split('/').map(function(name) {
+            url += '/' + name;
+            return {
+                name: name,
+                url: url.replace('//', '/')
+            }
         });
+        if(stats.isFile()) {
+            fs.readFile(path, "utf8", function(err, data) {
+                if (err) console.error(err);
+                else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs});
+            })
+        } else {
+            storage.list(blob, function(files) {
+                res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs});
+            });
+        }
+    }
+
+    // POST new folder
+    if(req.body.name != undefined) {
+        storage.mkdir(blob + '/' + req.body.name, render);
+    } else {
+        render();
     }
 });
 
