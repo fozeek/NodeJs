@@ -2,12 +2,12 @@ var mongo = require('mongodb');
 var monk = require('monk');
 
 function database(name) {
-    this.db = monk("node.dev/"+name);
+    this.db = monk("localhost/"+name);
     //this.db.get('User').drop();
 
-    this.db.get('Ressource').find({}, function(e, users){
-        console.log(users);
-    });
+    // this.db.get('Ressource').find({}, function(e, users){
+    //     console.log(users);
+    // });
 }
 
 database.prototype = {

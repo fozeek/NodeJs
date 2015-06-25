@@ -34,7 +34,7 @@
                 <a href="<%= directory.url %>">
                 <h4 style="margin-bottom: 0px;"><%= directory.name %></h4>
                 </a>
-                Créé il y a <%= directory.time.hours %> heure, <%= directory.time.minutes %> minutes et <%= directory.time.secondes %> secondes
+                Créé il y a <%= directory.time.hours %> heure, <%= directory.time.minutes %> minutes et <%= directory.time.secondes %> secondes - <%= directory.db.download %> téléchargements - By <%= directory.db.creator %>
             </div>
             <hr>
         <% }); %>

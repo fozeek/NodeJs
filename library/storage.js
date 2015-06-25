@@ -107,6 +107,7 @@ storage.prototype = {
     },
     list: function(blob, cb) {
         this.fullPath += '/' + blob;
+        var pathToCheck = this.name + blob;
         var url = '/' + this.name + '/';
         var urlDownload = '/d/' + this.name + '/';
         var path = this.path;
@@ -141,7 +142,10 @@ storage.prototype = {
                         urlDl: fileDownloadPath.replace('//', '/')
                     };
                 });
-                if(cb) cb(stats);
+                var paths = files.map(function(path) {
+                    return pathToCheck + '/' + path;
+                });
+                if(cb) cb(stats, paths);
             }
         });
     },

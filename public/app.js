@@ -10,6 +10,8 @@ var parser = require('body-parser');
 var path = require('path');
 var session = require('express-session');
 var mkdirp = require('mkdirp');
+var mime = require('mime');
+var pathManager = require('path');
 
 //var users = db.get('User');
 //users.insert({pseudo:"musha", password:"test"});
@@ -39,11 +41,11 @@ app.use(multer({ dest: './storage/',
     // onFileUploadStart: function (file) {
     //     console.log(file.originalname + ' is starting ...')
     // },
-    onFileUploadComplete: function (file) {
-        //req.db.createRessource(file.path + file.name);
+    onFileUploadComplete: function (file, req, res) {
+        req.db.createRessource(file.path.replace('storage/', ''), req.session.user.pseudo);
     },
     changeDest: function(dest, req, res) {
-        return dest + req._parsedUrl + '/';
+        return dest + req._parsedUrl.pathname + '/';
     }
 }));
 
@@ -110,33 +112,38 @@ app.route('/signin')
     });
 
 app.all('/', function(req, res){
-    console.log(req.db.getRessources('fkezfez'));
     var render = function() {
         fs.readdir('storage/', function(err, folders) {
             if (err) {
                 console.error(err);
-                if(cb) cb([]);
             }
             else {
-                var directories = folders.map(function(folder){
-                    var stats = fs.lstatSync('storage/' + folder);
-                    var long = Date.now() - stats.ctime.getTime();
-                    var time = {
-                        hours: Math.floor(long/3600000),
-                        minutes: Math.floor((long/60000)%60),
-                        secondes: Math.floor((long/1000)%60)
-                    };
-                    var db = req.db.getRessource(folder);
-                    return {
-                        name: folder,
-                        stats: stats,
-                        url: '/' + folder + '/',
-                        time: time,
-                        urlDl: '/d/' + folder + '/',
-                        db: db
-                    };
+                req.db.getRessources(folders, function(objects) {
+                    var directories = folders.map(function(folder){
+                        var stats = fs.lstatSync('storage/' + folder);
+                        var long = Date.now() - stats.ctime.getTime();
+                        var time = {
+                            hours: Math.floor(long/3600000),
+                            minutes: Math.floor((long/60000)%60),
+                            secondes: Math.floor((long/1000)%60)
+                        };
+                        var db = {};
+                        objects.forEach(function(repo) {
+                            if(repo.path == folder) {
+                                db = repo
+                            }
+                        });
+                        return {
+                            name: folder,
+                            stats: stats,
+                            url: '/' + folder + '/',
+                            time: time,
+                            urlDl: '/d/' + folder + '/',
+                            db: db
+                        };
+                    });
+                    res.render('directories', {directories: directories, user: req.session.user});
                 });
-                res.render('directories', {directories: directories, user: req.session.user});
             }
         });
     };
@@ -147,7 +154,7 @@ app.all('/', function(req, res){
             if(!exists) {
                 mkdirp('storage/' + req.body.name, function(err) {
                     if (err) console.error(err);
-                    //req.db.createRessource(req.body.name);
+                    req.db.createRessource(req.body.name, req.session.user.pseudo);
                     render();
                 });
             }
@@ -157,9 +164,12 @@ app.all('/', function(req, res){
     }
 });
 
+app.get('/img/*', function (req, res) {
+    res.sendFile(pathManager.dirname(__dirname) + '/storage/' +  req.params[0].replace('img/', ''));
+});
+
 app.get('/d/:hash*', function(req, res){
     var blob = req.params[0].replace('d/' + req.params.hash, '');
-    console.log(req.params[0], blob);
     var storage = new Storage(req.params.hash);
     storage.download(blob, function(file, tmp){
         res.download(file, function() {
@@ -175,36 +185,44 @@ app.all('/:hash*', function(req, res){
     var storage = new Storage(req.params.hash);
 
     var render = function() {
-        var url = ('/' + req.params.hash + '/').replace('//', '/');
-        var breadcrumbs = blob.split('/').map(function(name) {
+        var url = ('/' + req.params.hash).replace('//', '/');
+        var breadcrumbs = blob.split('/').filter(function(name) {
+            if(name == "") return false;
+            else return name;
+        }).map(function(name) {
             url += '/' + name;
             return {
                 name: name,
                 url: url
             }
-        }).filter(function(bc) {
-            if(bc.name.length == 0) return false;
-            else return bc;
         });
         if(stats.isFile()) {
+            var type = mime.lookup(path);
             fs.readFile(path, "utf8", function(err, data) {
                 if (err) console.error(err);
-                else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs});
+                else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs, stats: stats, mime: type, url: '/img/' + path.replace('storage/', '')});
             })
         } else {
-            storage.list(blob, function(files) {
-                // var array = files.map(function(item) {
-                //     item.db = req.db.getRessource(item.url);
-                //     return  item;
-                // });
-                res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs, user: req.session.user});
+            storage.list(blob, function(files, paths) {
+                req.db.getRessources(paths, function(objects) {
+                    var directories = files.map(function(repo) {
+                        repo.db = {};
+                        objects.forEach(function(object) {
+                            if('/' + object.path == repo.url) {
+                                repo.db = object;
+                            }
+                        });
+                        return repo;
+                    });
+                    res.render('list', {storage: storage, files: directories, breadcrumbs: breadcrumbs, user: req.session.user});
+                });
             });
         }
     }
 
     // POST new folder
     if(req.body.name != undefined) {
-        //req.db.createRessource(blob + '/' + req.body.name);
+        req.db.createRessource(req.params.hash + blob + '/' + req.body.name, req.session.user.pseudo);
         storage.mkdir(blob + '/' + req.body.name, render);
     } else {
         render();

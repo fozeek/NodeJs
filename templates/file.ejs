@@ -11,7 +11,11 @@
         <h1><small>Storage of </small><%= storage.getName() %></h1>
         <a href="<%= storage.getUrl() %>"><%= storage.getName() %></a><% breadcrumbs.forEach(function(breadcrumb){ %>/<a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a><% }); %>
         <hr style="margin-top: 0px;">
+        <% if(mime == 'image/png' || mime == 'image/gif' || mime == 'image/jpeg') { %>
+        <img style="max-width: 100%;" src="<%= url %>">
+        <% } else { %>
         <pre><%= data.toString() %></pre>
+        <% } %>
     </div>
 </body>
 </html>

@@ -41,7 +41,7 @@
                 <a href="<%= file.url %>">
                 <h4 style="margin-bottom: 0px;"><i class="fa fa-<%= file.mime %>"></i> <%= file.name %></h4>
                 </a>
-                <%= file.stats.ctime.getDate() %>/<%= file.stats.ctime.getMonth()+1 %>/<%= file.stats.ctime.getFullYear() %> à <%= file.stats.ctime.getSeconds() %>:<%= file.stats.ctime.getMinutes() %>:<%= file.stats.ctime.getHours() %>
+                <%= file.stats.ctime.getDate() %>/<%= file.stats.ctime.getMonth()+1 %>/<%= file.stats.ctime.getFullYear() %> à <%= file.stats.ctime.getSeconds() %>:<%= file.stats.ctime.getMinutes() %>:<%= file.stats.ctime.getHours() %> - <%= file.db.download %> téléchargements - By <%= file.db.creator %>
             </div>
         <% }); %>
     </div> 
