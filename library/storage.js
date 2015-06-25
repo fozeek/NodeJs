@@ -108,7 +108,7 @@ storage.prototype = {
     list: function(blob, cb) {
         this.fullPath += '/' + blob;
         var url = '/' + this.name + '/';
-        var urlDownload = '/' + this.name + '/';
+        var urlDownload = '/d/' + this.name + '/';
         var path = this.path;
         if(cb == undefined) {
             cb = blob;

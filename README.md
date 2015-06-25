@@ -38,3 +38,12 @@ Application web multipage templaté :
 
 https://scotch.io/tutorials/use-ejs-to-template-your-node-application
 
+
+//Lancer MongoDb
+Télécharger les fichiers mongo.
+Mettre le contenu de bin dans /data/db
+
+Lancer la commande pour démarrer le serveur
+./mongod --dbpath ./data/db
+
+
