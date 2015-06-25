@@ -42,7 +42,7 @@ app.use(multer({ dest: './storage/',
     }
 }));
 
-app.route('/')
+app.route('/login')
     .get(function(req, res){
         res.render('index', {message:false});
     })
@@ -98,39 +98,33 @@ app.route('/signin')
         }
     });
 
-// app.get('/nodes', function(req, res){
-//     fs.readdir('storage/', function(err, folders) {
-//         if (err) {
-//             console.error(err);
-//             if(cb) cb([]);
-//         }
-//         else {
-//             var directories = folders.map(function(folder){
-//                 var stats = fs.lstatSync('storage/' + folder);
-//                 var long = Date.now() - stats.ctime.getTime();
-//                 var time = {
-//                     hours: Math.floor(long/3600000),
-//                     minutes: Math.floor((long/60000)%60),
-//                     secondes: Math.floor((long/1000)%60)
-//                 };
-//                 return {
-//                     name: folder,
-//                     stats: stats,
-//                     url: '/nodes/' + folder + '/blob/',
-//                     time: time,
-//                     urlDl: '/nodes/' + folder + '/download/',
-//                 };
-//             });
-//             res.render('directories', {directories: directories});
-//         }
-//     });
-// });
-// app.get('/:hash', function(req, res){
-//     var storage = new Storage(req.params.hash);
-//     storage.list(function(files) {
-//         res.render('list', {storage: storage, files: files, path:req.originalUrl});
-//     });
-// });
+app.get('/', function(req, res){
+    fs.readdir('storage/', function(err, folders) {
+        if (err) {
+            console.error(err);
+            if(cb) cb([]);
+        }
+        else {
+            var directories = folders.map(function(folder){
+                var stats = fs.lstatSync('storage/' + folder);
+                var long = Date.now() - stats.ctime.getTime();
+                var time = {
+                    hours: Math.floor(long/3600000),
+                    minutes: Math.floor((long/60000)%60),
+                    secondes: Math.floor((long/1000)%60)
+                };
+                return {
+                    name: folder,
+                    stats: stats,
+                    url: '/nodes/' + folder + '/blob/',
+                    time: time,
+                    urlDl: '/nodes/' + folder + '/download/',
+                };
+            });
+            res.render('directories', {directories: directories});
+        }
+    });
+});
 
 app.all('/:hash*', function(req, res){
     var blob = req.params[0].replace(req.params.hash, '');
@@ -139,13 +133,16 @@ app.all('/:hash*', function(req, res){
     var storage = new Storage(req.params.hash);
 
     var render = function() {
-        var url = '/' + req.params.hash + '/';
+        var url = ('/' + req.params.hash + '/').replace('//', '/');
         var breadcrumbs = blob.split('/').map(function(name) {
             url += '/' + name;
             return {
                 name: name,
-                url: url.replace('//', '/')
+                url: url
             }
+        }).filter(function(bc) {
+            if(bc.name.length == 0) return false;
+            else return bc;
         });
         if(stats.isFile()) {
             fs.readFile(path, "utf8", function(err, data) {

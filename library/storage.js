@@ -52,7 +52,7 @@ storage.prototype = {
         return this.name;
     },
     getUrl: function() {
-        return '/nodes/' + this.name + '/blob/';
+        return '/' + this.name + '';
     },
     getPath: function() {
         return this.path;
@@ -107,8 +107,8 @@ storage.prototype = {
     },
     list: function(blob, cb) {
         this.fullPath += '/' + blob;
-        var url = '/nodes/' + this.name + '/blob/';
-        var urlDownload = '/nodes/' + this.name + '/download/';
+        var url = '/' + this.name + '/';
+        var urlDownload = '/' + this.name + '/';
         var path = this.path;
         if(cb == undefined) {
             cb = blob;
