@@ -3,6 +3,7 @@ var express = require('express');
 var Client = require('../library/client');
 var Storage = require('../library/storage');
 var fs = require('graceful-fs');
+var rmdir = require('rimraf');
 
 
 //Access DB
@@ -45,9 +46,30 @@ app.post('/account', function(req, res){
 });
 
 app.get('/nodes', function(req, res){
-    var user = new Client(req.params.user);
-    user.getStorage().list(function(files) {
-        res.render('account', {user: user, files: files, path:req.originalUrl});
+    fs.readdir('storage/', function(err, folders) {
+        if (err) {
+            console.error(err);
+            if(cb) cb([]);
+        }
+        else {
+            var directories = folders.map(function(folder){
+                var stats = fs.lstatSync('storage/' + folder);
+                var long = Date.now() - stats.ctime.getTime();
+                var time = {
+                    hours: Math.floor(long/3600000),
+                    minutes: Math.floor((long/60000)%60),
+                    secondes: Math.floor((long/1000)%60)
+                };
+                return {
+                    name: folder,
+                    stats: stats,
+                    url: '/nodes/' + folder + '/blob/',
+                    time: time,
+                    urlDl: '/nodes/' + folder + '/download/',
+                };
+            });
+            res.render('directories', {directories: directories});
+        }
     });
 });
 app.get('/nodes/:hash', function(req, res){
@@ -61,15 +83,22 @@ app.get('/nodes/:hash/blob/*', function(req, res){
     var path = 'storage/' + req.params.hash + '/' + blob;
     var stats = fs.lstatSync(path);
     var storage = new Storage(req.params.hash);
+    var url = '/nodes/' + req.params.hash + '/blob/';
+    var breadcrumbs = blob.split('/').map(function(name) {
+        url += '/' + name;
+        return {
+            name: name,
+            url: url.replace('//', '/')
+        }
+    });
     if(stats.isFile()) {
         fs.readFile(path, "utf8", function(err, data) {
             if (err) console.error(err);
-            else res.render('file', {storage: storage, data: data});
+            else res.render('file', {storage: storage, data: data, breadcrumbs: breadcrumbs});
         })
     } else {
-        console.log('lol');
         storage.list(blob, function(files) {
-            res.render('list', {storage: storage, files: files});
+            res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs});
         });
     }
 });
@@ -84,3 +113,30 @@ app.get('/nodes/:hash/download/*', function(req, res){
 });
 
 var server = app.listen(3000);
+
+setInterval(cron, 60000);
+
+// Cron de suppression des dossiers
+function cron() {
+    var path = 'storage/';
+    var now = Date.now();
+    var ttl = 3600000;
+    fs.readdir(path, function(err, folders) {
+        if (err) {
+            console.error(err);
+            if(cb) cb([]);
+        }
+        else {
+            stats = folders.forEach(function(folder){
+                var stats = fs.lstatSync(path + folder);
+                console.log(path + folder, now, stats.ctime.getTime());
+                if(now - stats.ctime.getTime() > ttl) {
+                    rmdir(path + folder, function(err) {
+                        if (err) console.error(err);
+                    });
+                }
+            });
+        }
+    });
+}
+

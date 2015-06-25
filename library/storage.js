@@ -50,6 +50,9 @@ storage.prototype = {
     getName: function() {
         return this.name;
     },
+    getUrl: function() {
+        return '/nodes/' + this.name + '/blob/';
+    },
     write: function(file, content) {
         var path = pathManager.dirname(file);
         var file = this.path + '/' + file;
@@ -137,17 +140,27 @@ storage.prototype = {
     download: function(blob, cb) {
         var storage = 'storage/' + this.name + '/' + blob;
         var stat = fs.lstatSync(storage);
+        var that = this;
         if(stat.isFile()) {
             cb(storage, false);
         } else if(stat.isDirectory()) {
             var zip = new easyzip.EasyZip();
             zip.zipFolder(storage, function(){
-                var tmp = 'tmp/'+ pathManager.basename(blob) + '.zip';
+                var tmp = 'tmp/'+ that.generate(20) + '.zip';
                 zip.writeToFile(tmp, function() {
                     cb(tmp, true);
                 });
             });
         }
+    }, 
+    generate: function(nbcar) {
+        var ListeCar = new Array("a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9");
+        var Chaine ='';
+        for(i = 0; i < nbcar; i++)
+        {
+            Chaine = Chaine + ListeCar[Math.floor(Math.random()*ListeCar.length)];
+        }
+        return Chaine;
     }
 };
 

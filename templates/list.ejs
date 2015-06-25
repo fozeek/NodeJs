@@ -9,7 +9,8 @@
     <div class="container" style="width: 700px; margin-top: 50px">
 
         <h1><small>Storage of </small><%= storage.getName() %></h1>
-        <hr>
+        <a href="<%= storage.getUrl() %>"><%= storage.getName() %></a><% breadcrumbs.forEach(function(breadcrumb){ %>/<a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a><% }); %>
+        <hr style="margin-top: 0px;">
         <% files.forEach(function(file){ %>
             <div>
                 <a href="<%= file.urlDl %>">

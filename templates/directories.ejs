@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connexion</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="container" style="width: 700px; margin-top: 50px">
+
+        <h1>Supa Storage</h1>
+        <hr>
+        <% directories.forEach(function(directory){ %>
+            <div>
+                <a href="<%= directory.urlDl %>">
+                    <span class="pull-right"><i class="fa fa-cloud-download fa-2x"></i></span>
+                </a>
+                <a href="<%= directory.url %>">
+                <h4 style="margin-bottom: 0px;"><%= directory.name %></h4>
+                </a>
+                Créé il y a <%= directory.time.hours %> heure, <%= directory.time.minutes %> minutes et <%= directory.time.secondes %> secondes
+            </div>
+            <hr>
+        <% }); %>
+    </div>
+</body>
+</html>

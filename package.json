@@ -9,6 +9,7 @@
     "mkdirp": "*",
     "mongodb": "^2.0.35",
     "monk": "*",
-    "node-zip": "^1.1.1"
+    "node-zip": "^1.1.1",
+    "rimraf": "^2.4.0"
   }
 }
