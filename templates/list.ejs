@@ -8,6 +8,8 @@
 </head>
 <body>
     <div class="container" style="width: 700px; margin-top: 50px">
+        
+        <% if (user) { %>
         <form id="form" enctype="multipart/form-data" action="" method="post" style="display: none;">
             <input type="file" name="userPhoto" />
         </form>
@@ -15,6 +17,10 @@
             <input type="text" name="name" />
         </form>
         <button id="upload" class="btn btn-default pull-right" href="#" role="button">Add File</button>
+        <% } else { %>
+        t'es niqué
+        <% } %>
+
         <div class="input-group pull-right" style="width: 250px;margin-right: 8px;">
           <input id="name-folder" type="text" name="folder" class="form-control" placeholder="Folder name">
           <span id="submit-folder" class="input-group-btn">

@@ -8,6 +8,7 @@ var rmdir = require('rimraf');
 var multer  = require('multer');
 var parser = require('body-parser');
 var path = require('path');
+var session = require('express-session');
 
 //var users = db.get('User');
 //users.insert({pseudo:"musha", password:"test"});
@@ -15,6 +16,9 @@ var path = require('path');
 var app = express();
 app.use(parser.urlencoded({extended:true})); 
 app.use(parser.json());
+app.use(session({
+    secret: 'muusha'
+}));
 //app.use(express.bodyParser());
 //Acces aux objets statiques
 app.use(express.static(path.join(__dirname, '../static')));
@@ -26,6 +30,7 @@ app.use(function(req,res,next){
     req.db = new Database('db');
     next();
 });
+
 app.use(multer({ dest: './storage/',
     rename: function (fieldname, filename) {
         return filename;
@@ -51,10 +56,10 @@ app.route('/login')
             var db = req.db;
             db.getUser(req.body.pseudo, req.body.password, function(users){
                 if (users.length == 1) {
-                    console.log('test');
+                    req.session.user = users[0];
                     res.redirect('/nodes');
                 } else {
-                    var message = 'Utilisateur incorrect.';
+                    var message = 'Identifiants incorrects.';
                     res.render('index', {message:message});
                 } 
             });
@@ -151,7 +156,7 @@ app.all('/:hash*', function(req, res){
             })
         } else {
             storage.list(blob, function(files) {
-                res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs});
+                res.render('list', {storage: storage, files: files, breadcrumbs: breadcrumbs, user: req.session.user});
             });
         }
     }
