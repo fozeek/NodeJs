@@ -8,6 +8,7 @@ var rmdir = require('rimraf');
 var multer  = require('multer');
 var parser = require('body-parser');
 var path = require('path');
+var session = require('express-session');
 
 //var users = db.get('User');
 //users.insert({pseudo:"musha", password:"test"});
@@ -15,6 +16,9 @@ var path = require('path');
 var app = express();
 app.use(parser.urlencoded({extended:true})); 
 app.use(parser.json());
+app.use(session({
+    secret: 'muusha'
+}));
 //app.use(express.bodyParser());
 //Acces aux objets statiques
 app.use(express.static(path.join(__dirname, '../static')));
@@ -43,7 +47,7 @@ app.use(multer({ dest: './storage/',
 }));
 
 app.get('/', function(req, res){
-    res.render('index');
+    res.render('index', {message:false});
 });
 
 app.route('/')
@@ -55,7 +59,7 @@ app.route('/')
             var db = req.db;
             db.getUser(req.body.pseudo, req.body.password, function(users){
                 if (users.length == 1) {
-                    console.log('test');
+                    req.session.user = users[0];
                     res.redirect('/nodes');
                 } else {
                     var message = 'Utilisateur incorrect.';
@@ -103,6 +107,7 @@ app.route('/signin')
     });
 
 app.get('/nodes', function(req, res){
+    console.log(req.session.user);
     fs.readdir('storage/', function(err, folders) {
         if (err) {
             console.error(err);
