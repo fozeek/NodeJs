@@ -3,6 +3,7 @@ var mkdirp = require('mkdirp');
 var pathManager = require('path');
 var mime = require('mime');
 var easyzip = require('easy-zip');
+var targz = require('tar.gz');
 
 function storage(name) {
     this.path = 'storage/' + name;
@@ -150,18 +151,22 @@ storage.prototype = {
         });
     },
     download: function(blob, cb) {
-        var storage = 'storage/' + this.name + '/' + blob;
+        var storage = 'storage/' + this.name + blob;
         var stat = fs.lstatSync(storage);
         var that = this;
         if(stat.isFile()) {
             cb(storage, false);
         } else if(stat.isDirectory()) {
-            var zip = new easyzip.EasyZip();
-            zip.zipFolder(storage, function(){
-                var tmp = 'tmp/'+ that.generate(20) + '.zip';
-                zip.writeToFile(tmp, function() {
-                    cb(tmp, true);
-                });
+            // var zip = new easyzip.EasyZip();
+            // zip.zipFolder(storage, function(){
+            //     var tmp = 'tmp/'+ that.generate(20) + '.zip';
+            //     zip.writeToFile(tmp, function() {
+            //         cb(tmp, true);
+            //     });
+            // });
+            var tmp = 'tmp/'+ that.generate(20) + '.tar.gz';
+            var compress = new targz().compress(storage, tmp, function(err){
+                cb(tmp, true);
             });
         }
     }, 

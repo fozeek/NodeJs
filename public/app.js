@@ -112,7 +112,7 @@ app.route('/signin')
     });
 
 app.all('/', function(req, res){
-    var render = function() {
+    var render = function(message) {
         fs.readdir('storage/', function(err, folders) {
             if (err) {
                 console.error(err);
@@ -142,7 +142,7 @@ app.all('/', function(req, res){
                             db: db
                         };
                     });
-                    res.render('directories', {directories: directories, user: req.session.user});
+                    res.render('directories', {directories: directories, user: req.session.user, message: message});
                 });
             }
         });
@@ -151,12 +151,21 @@ app.all('/', function(req, res){
     // POST new folder
     if(req.body.name != undefined) {
         fs.exists('storage/' + req.body.name, function(exists) {
-            if(!exists) {
+            if(!exists 
+                && req.body.name != "img" 
+                && req.body.name != "signin"
+                 && req.body.name != "login"
+                 && req.body.name != "logout"
+                 && req.body.name != "d"
+                 && req.body.name != ""
+            ) {
                 mkdirp('storage/' + req.body.name, function(err) {
                     if (err) console.error(err);
                     req.db.createRessource(req.body.name, req.session.user.pseudo);
                     render();
                 });
+            } else {
+                render('Repo allready exists !');
             }
         });
     } else {
@@ -174,6 +183,7 @@ app.get('/d/:hash*', function(req, res){
     storage.download(blob, function(file, tmp){
         res.download(file, function() {
             if(tmp) fs.unlink(file);
+            req.db.updateRessource(file.replace('storage/', ''));
         });
     });
 });

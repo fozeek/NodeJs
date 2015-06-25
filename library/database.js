@@ -23,9 +23,10 @@ database.prototype = {
         this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
     },
     updateRessource: function(path) {
+        var db = this.db;
         this.getRessource(path, function(docs){
             var dl = docs[0].download+1;
-            this.db.get('Ressource').update({path:path}, { $set: {download:dl} });
+            db.get('Ressource').update({path:path}, { $set: {download:dl} });
         })  
     },
     getRessource: function(path, cb) {
