@@ -2,16 +2,16 @@ var http = require('http');
 var express = require('express');
 var Client = require('../library/client');
 var Storage = require('../library/storage');
+var Database = require('../library/database');
 var fs = require('graceful-fs');
 var parser = require('body-parser');
 
-//Access DB
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk("localhost:27017/db");
-
 //Acces aux objets statiques
 //app.use(express.static(path.join(__dirname, 'views')));
+
+
+//var users = db.get('User');
+//users.insert({pseudo:"musha", password:"test"});
 
 var app = express();
 app.use(parser.urlencoded({extended:true})); 
@@ -22,35 +22,41 @@ app.set('views', 'templates');
 app.set('view engine', 'ejs');
 
 app.use(function(req,res,next){
-    req.db = db;
+    req.db = new Database('db');
     next();
 });
 
 app.get('/', function(req, res){
-    res.render('index.ejs');
+    res.render('index');
 });
 
-app.post('/account', function(req, res){
+app.route('/signin')
+    .get(function(req, res){
+        res.render('inscription');
+    })
+    .post(function(req, res){
+        var db = req.db; 
+
+        if (req.body.pseudo != "" && req.body.password != "" && req.body.check != "") {
+            if (req.body.password == req.body.check) {
+                db.addUser(req.body.pseudo, req.body.password);
+                res.redirect('/');
+            }
+        }
+
+        res.redirect('inscription');
+    });
+
+app.post('/nodes', function(req, res){
     var db = req.db;
-    var collection = db.get('User');
+    var user = db.getUser(req.body.pseudo, req.body.password);
 
-    //pseudo:req.body.pseudo, password:req.body.password
-    console.log(collection);
-
-    collection.find({},{},function(e,docs){
-        //res.render('test.ejs', {
-          //  "userlist" : docs
-        //});
-        console.log(e, docs);
-        res.send(docs);
-    });
-});
-
-app.get('/nodes', function(req, res){
-    var user = new Client(req.params.user);
-    user.getStorage().list(function(files) {
-        res.render('account', {user: user, files: files, path:req.originalUrl});
-    });
+    if (user!="") {
+        var user = new Client(req.params.user);
+        user.getStorage().list(function(files) {
+            res.render('account', {user: user, files: files, path:req.originalUrl});
+        });
+    }
 });
 
 app.get('/nodes/:hash', function(req, res){
