@@ -46,33 +46,61 @@ app.get('/', function(req, res){
     res.render('index');
 });
 
+app.route('/')
+    .get(function(req, res){
+        res.render('index', {message:false});
+    })
+    .post(function(req, res){  
+        if (req.body.pseudo != "" && req.body.password != "") {
+            var db = req.db;
+            db.getUser(req.body.pseudo, req.body.password, function(users){
+                if (users.length == 1) {
+                    console.log('test');
+                    res.redirect('/nodes');
+                } else {
+                    var message = 'Utilisateur incorrect.';
+                    res.render('index', {message:message});
+                } 
+            });
+        } else {
+            message = 'Veuillez remplir les champs.';
+            res.render('index', {message:message});
+        }
+    }); 
+
 app.route('/signin')
     .get(function(req, res){
-        res.render('inscription');
+        res.render('inscription', {message:false});
     })
     .post(function(req, res){
         var db = req.db; 
+        var message;
 
         if (req.body.pseudo != "" && req.body.password != "" && req.body.check != "") {
             if (req.body.password == req.body.check) {
-                db.addUser(req.body.pseudo, req.body.password);
-                res.redirect('/');
+                var send = db.getUser(req.body.pseudo, req.body.password, function(users){
+                    if (users.length == 0) {
+                        db.addUser(req.body.pseudo, req.body.password);
+                        res.redirect('/');
+                    } else {
+                        message = 'Le pseudo est déjà utilisé.';
+                        res.render('inscription', {message:message});
+                    } 
+                });
+
+                if(send == false){
+                    message = 'Le pseudo est déjà utilisé.';
+                    res.render('inscription', {message:message});
+                }
+            } else {
+                message = 'Les mots de passe ne sont pas identiques.';
+                res.render('inscription', {message:message});
             }
+        } else {
+            message = 'Veuillez remplir les champs.';
+            res.render('inscription', {message:message});
         }
-
-        res.redirect('inscription');
     });
-// app.post('/nodes', function(req, res){
-//     var db = req.db;
-//     var user = db.getUser(req.body.pseudo, req.body.password);
-
-//     if (user!="") {
-//         var user = new Client(req.params.user);
-//         user.getStorage().list(function(files) {
-//             res.render('account', {user: user, files: files, path:req.originalUrl});
-//         });
-//     }
-// });
 
 app.get('/nodes', function(req, res){
     fs.readdir('storage/', function(err, folders) {

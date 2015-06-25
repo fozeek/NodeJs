@@ -11,8 +11,10 @@ function database(name) {
 }
 
 database.prototype = {
-    getUser: function(pseudo, password) {
-        return this.db.get('User').find({pseudo:pseudo, password:password});
+    getUser: function(pseudo, password, cb) {
+        this.db.get('User').find({pseudo:pseudo, password:password}, function(e, users){
+            cb(users);
+        });
     },
     addUser: function(name, pwd) {
         this.db.get('User').insert({pseudo:name, password:pwd});
