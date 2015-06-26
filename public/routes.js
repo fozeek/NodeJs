@@ -11,6 +11,10 @@ var mime = require('mime');
 var pathManager = require('path');
 
 function routes(app) {
+
+    /*
+        Page login
+    */
     app.route('/login')
         .get(function(req, res){
             res.render('index', {message:false});
@@ -33,17 +37,26 @@ function routes(app) {
             }
         }); 
 
+    /*
+        Page logout
+    */
     app.get('/logout', function(req, res){
         req.session.destroy();
         res.redirect('/');
     });
 
+    /*
+        Page about
+    */
     app.get('/about', function(req, res){
         req.db.getCreator(function(content){
             res.render('about', {users:content, url:'/img/'});
         });
     });
 
+    /*
+        Page signin
+    */
     app.route('/signin')
         .get(function(req, res){
             res.render('inscription', {message:false});
@@ -78,6 +91,10 @@ function routes(app) {
             }
         });
 
+    /*
+        Page Home
+            list all repos
+    */
     app.all('/', function(req, res){
         var render = function(message) {
             fs.readdir('storage/', function(err, folders) {
@@ -143,6 +160,10 @@ function routes(app) {
         }
     });
 
+    /*
+        Page img
+            url for request image
+    */
     app.get('/img/*', function (req, res) {
         res.sendFile(pathManager.dirname(__dirname) + '/storage/' +  req.params[0].replace('img/', ''));
     });
@@ -159,6 +180,10 @@ function routes(app) {
         });
     });
 
+    /*
+        Page r
+            Remove any ressource
+    */
     app.get('/r/:hash*', function(req, res){
         var blob = req.params[0].replace('d/' + req.params.hash, '');
         var storage = new Storage(req.params.hash);
@@ -167,6 +192,10 @@ function routes(app) {
         });
     });
 
+    /*
+        Page ressource
+            show a ressource or list for directory
+    */
     app.all('/:hash*', function(req, res){
         var blob = req.params[0].replace(req.params.hash, '');
         var path = 'storage/' + req.params.hash + blob;
