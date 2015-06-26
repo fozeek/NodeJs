@@ -154,6 +154,7 @@ app.all('/', function(req, res){
                             url: '/' + folder + '/',
                             time: time,
                             urlDl: '/d/' + folder + '/',
+                            urlRm: '/r/' + folder + '/',
                             db: db
                         };
                     });
