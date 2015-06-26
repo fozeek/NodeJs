@@ -14,8 +14,8 @@ database.prototype = {
     addUser: function(name, pwd) {
         this.db.get('User').insert({pseudo:name, password:pwd});
     },
-    createRessource: function(path, pseudo) {
-        this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
+    createRessource: function(path, pseudo, type) {
+        this.db.get('Ressource').insert({path:path, creator:pseudo, download:0, type:type});
     },
 
     getChild: function(paths, cb) {
@@ -43,9 +43,22 @@ database.prototype = {
             cb(docs);
         });
     },
-    getCreator: function(cb){
+    getCreator: function(cb) {
         this.db.get('Creator').find({}, {}, function(e, creators){
             cb(creators);
+        });
+    },
+    getStats: function(cb) {
+        this.db.get('Ressource').find({}, {}, function(e, ressources){
+            var nbRepo;
+            var nbFiles;
+            var nbDownload = 0;
+
+            ressources.forEach(function(value){
+
+                nbFiles += 1;
+                nbDownload = nbDownload + value.download;
+            });
         });
     },
     dbFill: function(){
