@@ -40,7 +40,7 @@ function routes(app) {
 
     app.get('/about', function(req, res){
         req.db.getCreator(function(content){
-            res.render('about', {users:content});
+            res.render('about', {users:content, url:'/img/'});
         });
     });
 

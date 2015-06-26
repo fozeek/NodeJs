@@ -36,10 +36,13 @@ app.set('view engine', 'ejs');
 var db = new Database('db');
 
 if(process.argv[2] == '--filldb') {
-    req.db.dbFill();
+    console.log('test');
+    db.dbFill();
 } else if (process.argv[2] == '--resetbase') {
-    req.db.resetBase();
+    db.resetBase();
 }
+
+db.printContent('Creator');
 
 app.use(function(req,res,next){
     req.db = db;
@@ -60,7 +63,6 @@ app.use(multer({ dest: './storage/',
         return dest + req._parsedUrl.pathname + '/';
     }
 }));
-
 
 // On créer les routes
 routes(app);
