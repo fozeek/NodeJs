@@ -34,10 +34,13 @@ app.set('view engine', 'ejs');
 var db = new Database('db');
 
 if(process.argv[2] == '--filldb') {
-    req.db.dbFill();
+    console.log('test');
+    db.dbFill();
 } else if (process.argv[2] == '--resetbase') {
-    req.db.resetBase();
+    db.resetBase();
 }
+
+db.printContent('Creator');
 
 app.use(function(req,res,next){
     req.db = db;
@@ -88,7 +91,7 @@ app.get('/logout', function(req, res){
 
 app.get('/about', function(req, res){
     req.db.getCreator(function(content){
-        res.render('about', {users:content});
+        res.render('about', {users:content, url:'/img/'});
     });
 });
 

@@ -1,5 +1,3 @@
-<%= users %>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +6,25 @@
 </head>
 <body>
     <div class="container" style="width: 500px; margin-top: 50px">
-        
+        <h2>About us</h2>
+        <div class="creators" style="margin-top: 50px;">
+            <div class="row">
+                <% for (var i=0; i<users.length; i++) { %>
+                <div class="col-md-6" style="text-align: center">
+                    <img src="<%= url+users[i].photo %>" class="img-circle img-responsive" style="height: 140px; width: 140px; margin: auto">
+                    <h4 style="margin-top: 20px;"><%= users[i].firstname %> <%= users[i].name %></h4>
+                </div>
+                <% } %>
+            </div>
+            </div class="row">
+                <h3 style="margin-top: 50px">Description du projet</h3>
+                <h5>Il est dans l'air du temps de partager. Nous souhaitons mettre à disposition des utilisateurs un système simple de partage de fichiers éphémères. Simple d'utilisation, Snapfolder vous permet de télécharger et d'uploader des fichiers et des répertoires que vous pourrez partager à vos amis.</h5>
+            </div>
+            </div class="row">
+                <h3 style="margin-top: 50px">Description du projet</h3>
+                <h5>Il est dans l'air du temps de partager. Nous souhaitons mettre à disposition des utilisateurs un système simple de partage de fichiers éphémères. Simple d'utilisation, Snapfolder vous permet de télécharger et d'uploader des fichiers et des répertoires que vous pourrez partager à vos amis.</h5>
+            </div>
+        </div>
     </div>
 </body>
 </html>

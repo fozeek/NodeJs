@@ -3,11 +3,6 @@ var monk = require('monk');
 
 function database(name) {
     this.db = monk("localhost/"+name);
-    //this.db.get('User').drop();
-
-    // this.db.get('Ressource').find({}, function(e, users){
-    //     console.log(users);
-    // });
 }
 
 database.prototype = {
@@ -23,7 +18,7 @@ database.prototype = {
         this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
     },
     getChild: function(paths) {
-        this.db.get('Ressource').find({path: { $regex: $in { paths } }, function(e, users){
+        this.db.get('Ressource').find({path: {$regex: {$in: paths}}}, function(e, users){
             cb(users);
         }); 
     },
@@ -61,6 +56,11 @@ database.prototype = {
         this.db.get('User').drop();
         this.db.get('Ressource').drop();
         this.db.get('Creator').drop();
+    },
+    printContent: function(collection) {
+        this.db.get(collection).find({}, function(e, users){
+            console.log(users);
+        });
     }
 }
 
