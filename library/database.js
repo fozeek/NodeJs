@@ -20,7 +20,21 @@ database.prototype = {
         this.db.get('User').insert({pseudo:name, password:pwd});
     },
     createRessource: function(path, pseudo) {
-        this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
+        this.db.get('Ressource').insert({path:path, creator:pseudo, download:0, child:0});
+    },
+    addRessourceChild: function(path) {
+        var db = this.db;
+        this.getRessource(path, function(docs){
+            var dl = docs[0].child+1;
+            db.get('Ressource').update({path:path}, { $set: {download:dl} });
+        });  
+    },
+    removeRessourceChild: function(path) {
+        var db = this.db;
+        this.getRessource(path, function(docs){
+            var dl = docs[0].child-1;
+            db.get('Ressource').update({path:path}, { $set: {download:dl} });
+        });  
     },
     updateRessource: function(path) {
         var db = this.db;
@@ -49,8 +63,8 @@ database.prototype = {
     },
     dbFill: function(){
         this.addUser('musha', 'test');
-        this.db.get('Creator').insert({firstname:'Jonathan', name:'BICHEUX', photo:'tofill'});
-        this.db.get('Creator').insert({firstname:'Quentin', name:'DENEUVE', photo:'tofill'});
+        this.db.get('Creator').insert({firstname:'Jonathan', name:'BICHEUX', photo:'jonathan.jpeg'});
+        this.db.get('Creator').insert({firstname:'Quentin', name:'DENEUVE', photo:'quentin.jpeg'});
     },
     resetBase: function(){
         this.db.get('User').drop();
