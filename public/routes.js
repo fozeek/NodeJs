@@ -105,32 +105,35 @@ function routes(app) {
                     console.error(err);
                 }
                 else {
-                    req.db.getRessources(folders, function(objects) {
-                        var directories = folders.map(function(folder){
-                            var stats = fs.lstatSync('storage/' + folder);
-                            var long = Date.now() - stats.ctime.getTime();
-                            var time = {
-                                hours: Math.floor(long/3600000),
-                                minutes: Math.floor((long/60000)%60),
-                                secondes: Math.floor((long/1000)%60)
-                            };
-                            var db = {};
-                            objects.forEach(function(repo) {
-                                if(repo.path == folder) {
-                                    db = repo
-                                }
+                    req.db.getAllChild(function(results) {
+                        req.db.getRessources(folders, function(objects) {
+                            var directories = folders.map(function(folder){
+                                var stats = fs.lstatSync('storage/' + folder);
+                                var long = Date.now() - stats.ctime.getTime();
+                                var time = {
+                                    hours: Math.floor(long/3600000),
+                                    minutes: Math.floor((long/60000)%60),
+                                    secondes: Math.floor((long/1000)%60)
+                                };
+                                var db = {};
+                                objects.forEach(function(repo) {
+                                    if(repo.path == folder) {
+                                        db = repo
+                                    }
+                                });
+                                return {
+                                    name: folder,
+                                    stats: stats,
+                                    url: '/' + folder + '/',
+                                    time: time,
+                                    urlDl: '/d/' + folder + '/',
+                                    urlRm: '/r/' + folder + '/',
+                                    db: db,
+                                    nbFiles: results[db.path]
+                                };
                             });
-                            return {
-                                name: folder,
-                                stats: stats,
-                                url: '/' + folder + '/',
-                                time: time,
-                                urlDl: '/d/' + folder + '/',
-                                urlRm: '/r/' + folder + '/',
-                                db: db
-                            };
+                            res.render('directories', {directories: directories, user: req.session.user, message: message});
                         });
-                        res.render('directories', {directories: directories, user: req.session.user, message: message});
                     });
                 }
             });

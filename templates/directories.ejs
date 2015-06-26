@@ -46,7 +46,7 @@
                 <a href="<%= directory.url %>">
                 <h4 style="margin-bottom: 0px;"><i class="fa fa-folder"></i> <%= directory.name %></h4>
                 </a>
-                <i class="fa fa-heart"></i> <%= directory.time.minutes %> min, <%= directory.time.secondes %> sec <i class="fa fa-cloud-download"></i> <%= directory.db.download %> <i class="fa fa-user"></i> <%= directory.db.creator %> <i class="fa fa-files-o"></i>
+                <i class="fa fa-heart"></i> <%= directory.time.minutes %> min, <%= directory.time.secondes %> sec <i class="fa fa-cloud-download"></i> <%= directory.db.download %> <i class="fa fa-user"></i> <%= directory.db.creator %> <i class="fa fa-files-o"></i> <%= directory.nbFiles %>
             </div>
             <hr>
         <% }); %>

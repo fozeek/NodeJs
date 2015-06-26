@@ -38,7 +38,7 @@ database.prototype = {
                             nbFiles += 1;
                         }
                     });
-                    result.push({name:value.path, nbFile:nbFiles});
+                    result[value.path] = nbFiles;
                 }
             });
 
