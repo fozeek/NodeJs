@@ -157,6 +157,7 @@ app.all('/', function(req, res){
                  && req.body.name != "login"
                  && req.body.name != "logout"
                  && req.body.name != "d"
+                 && req.body.name != "r"
                  && req.body.name != ""
             ) {
                 mkdirp('storage/' + req.body.name, function(err) {
@@ -184,7 +185,16 @@ app.get('/d/:hash*', function(req, res){
         res.download(file, function() {
             if(tmp) fs.unlink(file);
             req.db.updateRessource(req.params.hash+blob);
+            req.db.updateRessource(req.params.hash);
         });
+    });
+});
+
+app.get('/r/:hash*', function(req, res){
+    var blob = req.params[0].replace('d/' + req.params.hash, '');
+    var storage = new Storage(req.params.hash);
+    storage.remove(blob, function(file, tmp){
+        res.redirect('/');
     });
 });
 
@@ -214,7 +224,12 @@ app.all('/:hash*', function(req, res){
             })
         } else {
             storage.list(blob, function(files, paths) {
+                paths.push(req.params.hash+blob) // on ajoute le dossier courant
                 req.db.getRessources(paths, function(objects) {
+                    var current = {};
+                    objects.map(function(o) {
+                        if(o.path == req.params.hash+blob) current = o;
+                    });
                     var directories = files.map(function(repo) {
                         repo.db = {};
                         objects.forEach(function(object) {
@@ -224,7 +239,7 @@ app.all('/:hash*', function(req, res){
                         });
                         return repo;
                     });
-                    res.render('list', {storage: storage, files: directories, breadcrumbs: breadcrumbs, user: req.session.user});
+                    res.render('list', {storage: storage, files: directories, breadcrumbs: breadcrumbs, user: req.session.user, current: current});
                 });
             });
         }

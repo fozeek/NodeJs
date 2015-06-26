@@ -4,6 +4,7 @@ var pathManager = require('path');
 var mime = require('mime');
 var easyzip = require('easy-zip');
 var targz = require('tar.gz');
+var rmdir = require('rimraf');
 
 function storage(name) {
     this.path = 'storage/' + name;
@@ -75,33 +76,44 @@ storage.prototype = {
             }
         });
     },
-    remove: function(path) {
-        var path = this.path + '/' +  path;
-        fs.exists(path, function(exists) {
+    remove: function(path, cb) {
+        var fullpath = this.path + '/' +  path;
+        var stats = fs.lstatSync(fullpath);
+        if(stats.isFile()) {
+            this.unlink(path, cb);
+        } else {
+            this.rmdir(path, cb);
+        }
+    },
+    unlink: function(path, cb) {
+        var fullpath = this.path + '/' +  path;
+        fs.exists(fullpath, function(exists) {
             if(exists) {
-                fs.unlink(path);
+                fs.unlink(fullpath);
+                cb();
             }
         });
     },
-    mkdir: function(path, cb) {
-        var path = this.path + '/' +  path;
-        fs.exists(path, function(exists) {
-            if(!exists) {
-                mkdirp(path, function(err) {
+    rmdir: function(path, cb) {
+        var fullPath = this.path + '/' +  path;
+        fs.exists(fullPath, function(exists) {
+            if(exists) {
+                rmdir(fullPath, function(err) {
                     if (err) console.error(err);
-                    if(cb) {
-                        cb();
-                    }
+                    else cb();
                 });
             }
         });
     },
-    rmdir: function(path) {
-        var path = this.path + '/' +  path;
-        fs.exists(path, function(exists) {
-            if(exists) {
-                fs.rmdir(path, function(err) {
+    mkdir: function(path, cb) {
+        var fullpath = this.path + '/' +  path;
+        fs.exists(fullpath, function(exists) {
+            if(!exists) {
+                mkdirp(fullpath, function(err) {
                     if (err) console.error(err);
+                    if(cb) {
+                        cb();
+                    }
                 });
             }
         });
@@ -111,6 +123,7 @@ storage.prototype = {
         var pathToCheck = this.name + blob;
         var url = '/' + this.name + '/';
         var urlDownload = '/d/' + this.name + '/';
+        var urlRemove = '/r/' + this.name + '/';
         var path = this.path;
         if(cb == undefined) {
             cb = blob;
@@ -135,12 +148,14 @@ storage.prototype = {
                     }
                     var filePath = url + blob + '/' + file;
                     var fileDownloadPath = urlDownload + blob + '/' + file;
+                    var fileRemovePath = urlRemove + blob + '/' + file;
                     return {
                         name: file,
                         stats: stats,
                         mime: mimeclass,
                         url: filePath.replace('//', '/'),
-                        urlDl: fileDownloadPath.replace('//', '/')
+                        urlDl: fileDownloadPath.replace('//', '/'),
+                        urlRm: fileRemovePath.replace('//', '/')
                     };
                 });
                 var paths = files.map(function(path) {
