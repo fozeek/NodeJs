@@ -36,13 +36,10 @@ app.set('view engine', 'ejs');
 var db = new Database('db');
 
 if(process.argv[2] == '--filldb') {
-    console.log('test');
     db.dbFill();
 } else if (process.argv[2] == '--resetbase') {
     db.resetBase();
 }
-
-db.printContent('Creator');
 
 app.use(function(req,res,next){
     req.db = db;

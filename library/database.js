@@ -23,6 +23,28 @@ database.prototype = {
             cb(users);
         }); 
     },
+    getAllChild: function(cb) {
+        this.db.get('Ressource').find({}, {}, function(e, docs){
+            var result = [];
+            var tmp = docs;
+            docs.forEach(function(value){
+                if (value.type == "repo") {
+                    var repo = value.path;
+                    var nbFiles = 0;
+                    tmp.forEach(function(line){
+                        var regex = new RegExp('^'+repo+'\/');
+                        //console.log(regex);
+                        if(line.path.match(regex)){
+                            nbFiles += 1;
+                        }
+                    });
+                    result.push({name:value.path, nbFile:nbFiles});
+                }
+            });
+
+            cb(result);
+        });
+    },
     updateRessource: function(path) {
         var db = this.db;
         this.getRessource(path, function(docs){
@@ -50,16 +72,17 @@ database.prototype = {
     },
     getStats: function(cb) {
         this.db.get('Ressource').find({}, {}, function(e, ressources){
-            var nbRepo;
-            var nbFiles;
+            var nbRepo = 0;
+            var nbFiles = 0;
             var nbDownload = 0;
 
             ressources.forEach(function(value){
                 if(value.type == "repo"){
                     nbRepo += 1;
+                    nbDownload = nbDownload + value.download;
+                } else if(value.type == "file") {
+                    nbFiles += 1;
                 }
-                nbFiles += 1;
-                nbDownload = nbDownload + value.download;
             });
 
             cb(nbRepo, nbFiles, nbDownload);
