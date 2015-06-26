@@ -17,8 +17,9 @@ database.prototype = {
     createRessource: function(path, pseudo) {
         this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
     },
-    getChild: function(paths) {
-        this.db.get('Ressource').find({path: {$regex: {$in: paths}}}, function(e, users){
+
+    getChild: function(paths, cb) {
+        this.db.get('Ressource').find({path: { $regex: '^' + path } }, function(e, users){
             cb(users);
         }); 
     },
