@@ -112,9 +112,11 @@ storage.prototype = {
                 mkdirp(fullpath, function(err) {
                     if (err) console.error(err);
                     if(cb) {
-                        cb();
+                        cb(false);
                     }
                 });
+            } else {
+                cb("The folder allready exists !");
             }
         });
     },

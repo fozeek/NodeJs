@@ -33,6 +33,13 @@
         <h2 style="margin-top: 0px;"><%= storage.getName() %></h2>
         <span class="pull-right">By <%= current.creator %></span>
         <a href="<%= storage.getUrl() %>"><%= storage.getName() %></a><% breadcrumbs.forEach(function(breadcrumb){ %>/<a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a><% }); %>
+        <% if (message != false) { %>
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            <%= message %>        
+        </div>
+        <% } %>
         <hr style="margin-top: 0px;">
         <% files.forEach(function(file){ %>
             <div>
