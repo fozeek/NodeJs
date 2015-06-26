@@ -47,3 +47,10 @@ Lancer la commande pour démarrer le serveur
 ./mongod --dbpath ./data/db
 
 
+// commande pour base
+// reset
+node public/app.js --resetbase
+// fill db
+node public/app.js --filldb
+
+

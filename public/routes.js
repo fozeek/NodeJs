@@ -193,6 +193,11 @@ function routes(app) {
     app.get('/r/:hash*', function(req, res){
         var blob = req.params[0].replace('d/' + req.params.hash, '');
         var storage = new Storage(req.params.hash);
+        if(blob == undefined) {
+            req.db.deleteRessource(req.params.hash);
+        } else {
+            req.db.deleteRessource((req.params.hash + '/' + blob).replace('//', '/'));
+        }
         storage.remove(blob, function(file, tmp){
             res.redirect('/');
         });
