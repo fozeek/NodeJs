@@ -55,10 +55,14 @@ database.prototype = {
             var nbDownload = 0;
 
             ressources.forEach(function(value){
-
+                if(value.type == "repo"){
+                    nbRepo += 1;
+                }
                 nbFiles += 1;
                 nbDownload = nbDownload + value.download;
             });
+
+            cb(nbRepo, nbFiles, nbDownload);
         });
     },
     dbFill: function(){

@@ -41,7 +41,9 @@ function routes(app) {
     app.get('/about', function(req, res){
         req.db.getCreator(function(content){
             var creators = content;
-            res.render('about', {users:content, url:'/img/'});
+            req.db.getStats(function(repo, file, dl){
+                res.render('about', {users:creators, url:'/img/', repo:repo, file:file, dl:dl});
+            })
         });
     });
 
