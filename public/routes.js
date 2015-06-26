@@ -149,7 +149,7 @@ function routes(app) {
                 ) {
                     mkdirp('storage/' + req.body.name, function(err) {
                         if (err) console.error(err);
-                        req.db.createRessource(req.body.name, req.session.user.pseudo);
+                        req.db.createRessource(req.body.name, req.session.user.pseudo, 'repo');
                         render();
                     });
                 } else {
@@ -246,7 +246,7 @@ function routes(app) {
 
         // POST new folder
         if(req.body.name != undefined && req.body.name != "") {
-            req.db.createRessource(req.params.hash + blob + '/' + req.body.name, req.session.user.pseudo);
+            req.db.createRessource(req.params.hash + blob + '/' + req.body.name, req.session.user.pseudo, 'folder');
             storage.mkdir(blob + '/' + req.body.name, render);
         } else {
             render(false);
