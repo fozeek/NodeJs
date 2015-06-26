@@ -173,6 +173,7 @@ app.all('/', function(req, res){
                  && req.body.name != "logout"
                  && req.body.name != "d"
                  && req.body.name != "r"
+                 && req.body.name != "about"
                  && req.body.name != ""
             ) {
                 mkdirp('storage/' + req.body.name, function(err) {
@@ -219,7 +220,7 @@ app.all('/:hash*', function(req, res){
     var stats = fs.lstatSync(path);
     var storage = new Storage(req.params.hash);
 
-    var render = function() {
+    var render = function(message) {
         var url = ('/' + req.params.hash).replace('//', '/');
         var breadcrumbs = blob.split('/').filter(function(name) {
             if(name == "") return false;
@@ -254,18 +255,18 @@ app.all('/:hash*', function(req, res){
                         });
                         return repo;
                     });
-                    res.render('list', {storage: storage, files: directories, breadcrumbs: breadcrumbs, user: req.session.user, current: current});
+                    res.render('list', {storage: storage, files: directories, breadcrumbs: breadcrumbs, user: req.session.user, current: current, message: message});
                 });
             });
         }
     }
 
     // POST new folder
-    if(req.body.name != undefined) {
+    if(req.body.name != undefined && req.body.name != "") {
         req.db.createRessource(req.params.hash + blob + '/' + req.body.name, req.session.user.pseudo);
         storage.mkdir(blob + '/' + req.body.name, render);
     } else {
-        render();
+        render(false);
     }
 });
 
