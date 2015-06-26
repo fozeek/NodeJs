@@ -53,11 +53,8 @@ app.use(multer({ dest: './storage/',
     rename: function (fieldname, filename) {
         return filename;
     },
-    // onFileUploadStart: function (file) {
-    //     console.log(file.originalname + ' is starting ...')
-    // },
     onFileUploadComplete: function (file, req, res) {
-        req.db.createRessource(file.path.replace('storage/', ''), req.session.user.pseudo);
+        req.db.createRessource(file.path.replace('storage/', ''), req.session.user.pseudo, 'file');
     },
     changeDest: function(dest, req, res) {
         return dest + req._parsedUrl.pathname + '/';
