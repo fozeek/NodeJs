@@ -12,9 +12,8 @@ var session = require('express-session');
 var mkdirp = require('mkdirp');
 var mime = require('mime');
 var pathManager = require('path');
-
-
 var routes = require('./routes');
+var cron = require('../library/cron');
 
 //var users = db.get('User');
 //users.insert({pseudo:"musha", password:"test"});
@@ -66,30 +65,9 @@ app.use(multer({ dest: './storage/',
 // On créer les routes
 routes(app);
 
+// On lance le cron
+cron('storage/', 3600000, 60000);
+
+// On lance le server
 var server = app.listen(3000);
-
-setInterval(cron, 60000);
-
-// Cron de suppression des dossiers
-function cron() {
-    var path = 'storage/';
-    var now = Date.now();
-    var ttl = 3600000;
-    fs.readdir(path, function(err, folders) {
-        if (err) {
-            console.error(err);
-            if(cb) cb([]);
-        }
-        else {
-            stats = folders.forEach(function(folder){
-                var stats = fs.lstatSync(path + folder);
-                if(now - stats.ctime.getTime() > ttl) {
-                    rmdir(path + folder, function(err) {
-                        if (err) console.error(err);
-                    });
-                }
-            });
-        }
-    });
-};
 
