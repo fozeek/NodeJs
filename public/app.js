@@ -41,6 +41,7 @@ app.use(function(req,res,next){
     next();
 });
 
+
 app.use(multer({ dest: './storage/',
     rename: function (fieldname, filename) {
         return filename;
