@@ -31,6 +31,13 @@ app.set('view engine', 'ejs');
 
 app.use(function(req,res,next){
     req.db = new Database('db');
+
+    if(process.argv[2] == '--filldb') {
+        req.db.dbFill();
+    } else if (process.argv[2] == '--resetbase') {
+        req.db.resetBase();
+    }
+
     next();
 });
 
@@ -72,9 +79,14 @@ app.route('/login')
     }); 
 
 app.get('/logout', function(req, res){
-    //console.log(req.session.user);
     req.session.destroy();
     res.redirect('/');
+});
+
+app.get('/about', function(req, res){
+    req.db.getCreator(function(content){
+        res.render('about', {users:content});
+    });
 });
 
 app.route('/signin')

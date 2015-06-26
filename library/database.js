@@ -35,12 +35,27 @@ database.prototype = {
         });
     },
     deleteRessource: function(path) {
-
+        this.db.get('Ressource').remove({path:path});
     },
     getRessources: function(paths, cb){
         this.db.get('Ressource').find({path: {$in: paths}}, function(e, docs){
             cb(docs);
         });
+    },
+    getCreator: function(cb){
+        this.db.get('Creator').find({}, {}, function(e, creators){
+            cb(creators);
+        });
+    },
+    dbFill: function(){
+        this.addUser('musha', 'test');
+        this.db.get('Creator').insert({firstname:'Jonathan', name:'BICHEUX', photo:'tofill'});
+        this.db.get('Creator').insert({firstname:'Quentin', name:'DENEUVE', photo:'tofill'});
+    },
+    resetBase: function(){
+        this.db.get('User').drop();
+        this.db.get('Ressource').drop();
+        this.db.get('Creator').drop();
     }
 }
 
