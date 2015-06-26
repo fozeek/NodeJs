@@ -20,21 +20,12 @@ database.prototype = {
         this.db.get('User').insert({pseudo:name, password:pwd});
     },
     createRessource: function(path, pseudo) {
-        this.db.get('Ressource').insert({path:path, creator:pseudo, download:0, child:0});
+        this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
     },
-    addRessourceChild: function(path) {
-        var db = this.db;
-        this.getRessource(path, function(docs){
-            var dl = docs[0].child+1;
-            db.get('Ressource').update({path:path}, { $set: {download:dl} });
-        });  
-    },
-    removeRessourceChild: function(path) {
-        var db = this.db;
-        this.getRessource(path, function(docs){
-            var dl = docs[0].child-1;
-            db.get('Ressource').update({path:path}, { $set: {download:dl} });
-        });  
+    getChild: function(paths) {
+        this.db.get('Ressource').find({path: { $regex: $in { paths } }, function(e, users){
+            cb(users);
+        }); 
     },
     updateRessource: function(path) {
         var db = this.db;
