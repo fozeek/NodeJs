@@ -24,7 +24,7 @@
         <a class="btn btn-default pull-right" href="/signin" role="button">Inscription</a>
         <% } %> 
 
-        <h2 style="margin-top: 0px">SnapFolder</h2>
+        <h2 style="margin-top: 0px"><i class="fa fa-plus-square"></i>SnapFolder</h2>
         <% if (message != undefined) { %>
         <div class="alert alert-danger" role="alert">
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -38,9 +38,11 @@
                 <a href="<%= directory.urlDl %>">
                     <span class="pull-right"><i class="fa fa-cloud-download fa-2x"></i></span>
                 </a>
+                <% if (user && user.pseudo == directory.db.creator) { %>
                 <a href="<%= directory.urlRm %>">
                     <span class="pull-right" style="margin-right: 8px;"><i class="fa fa-remove fa-2x"></i></span>
                 </a>
+                <% } %>
                 <a href="<%= directory.url %>">
                 <h4 style="margin-bottom: 0px;"><i class="fa fa-folder"></i> <%= directory.name %></h4>
                 </a>
