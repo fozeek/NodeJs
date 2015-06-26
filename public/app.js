@@ -20,7 +20,9 @@ var app = express();
 app.use(parser.urlencoded({extended:true})); 
 app.use(parser.json());
 app.use(session({
-    secret: 'muusha'
+    secret: 'muusha',
+    resave: true,
+    saveUninitialized: true
 }));
 //app.use(express.bodyParser());
 //Acces aux objets statiques
@@ -29,20 +31,18 @@ app.use(express.static(path.join(__dirname, '../static')));
 app.set('views', 'templates');
 app.set('view engine', 'ejs');
 
+var db = new Database('db');
 
+if(process.argv[2] == '--filldb') {
+    req.db.dbFill();
+} else if (process.argv[2] == '--resetbase') {
+    req.db.resetBase();
+}
 
 app.use(function(req,res,next){
-    req.db = new Database('db');
-
-    if(process.argv[2] == '--filldb') {
-        req.db.dbFill();
-    } else if (process.argv[2] == '--resetbase') {
-        req.db.resetBase();
-    }
-
+    req.db = db;
     next();
 });
-
 
 app.use(multer({ dest: './storage/',
     rename: function (fieldname, filename) {

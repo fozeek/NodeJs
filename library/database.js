@@ -22,6 +22,11 @@ database.prototype = {
     createRessource: function(path, pseudo) {
         this.db.get('Ressource').insert({path:path, creator:pseudo, download:0});
     },
+    getChild: function(paths) {
+        this.db.get('Ressource').find({path: { $regex: $in { paths } }, function(e, users){
+            cb(users);
+        }); 
+    },
     updateRessource: function(path) {
         var db = this.db;
         this.getRessource(path, function(docs){
@@ -49,8 +54,8 @@ database.prototype = {
     },
     dbFill: function(){
         this.addUser('musha', 'test');
-        this.db.get('Creator').insert({firstname:'Jonathan', name:'BICHEUX', photo:'tofill'});
-        this.db.get('Creator').insert({firstname:'Quentin', name:'DENEUVE', photo:'tofill'});
+        this.db.get('Creator').insert({firstname:'Jonathan', name:'BICHEUX', photo:'jonathan.jpeg'});
+        this.db.get('Creator').insert({firstname:'Quentin', name:'DENEUVE', photo:'quentin.jpeg'});
     },
     resetBase: function(){
         this.db.get('User').drop();
